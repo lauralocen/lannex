@@ -152,5 +152,17 @@ footer .lg{display:flex;gap:18px;flex-wrap:wrap}
 <p>Si en el futuro añadimos herramientas de análisis u otras que usen cookies, actualizaremos esta política y te pediremos el consentimiento antes de instalarlas.</p>
 <h2>5. Cómo gestionar las cookies</h2>
 <p>Puedes ver, bloquear o borrar las cookies desde la configuración de tu navegador (Chrome, Safari, Firefox o Edge), en el apartado de privacidad.</p><p class="upd">Última actualización: octubre de 2026</p></div></section>
-<footer><div style="display:grid;gap:8px"><span>© 2026 Lannex Lab · Talleres privados en español e inglés</span><nav class="lg"><a href="aviso-legal.html">Aviso legal</a><a href="privacidad.html">Privacidad</a><a href="cookies.html">Cookies</a></nav></div><nav><a href="empresas.html">Empresas</a><a href="navidad.html">Navidad</a><a href="particulares.html">Particulares</a><a href="agencias.html">Agencias y hoteles</a><a href="talleres.html">Talleres</a><a href="contacto.html">Contacto</a></nav></footer></main><script>var f=document.getElementById('form');if(f)f.addEventListener('submit',function(e){e.preventDefault();var o=document.getElementById('ok');if(!document.getElementById('f-privacidad').checked){o.textContent='Para enviar la solicitud, marca la casilla de la política de privacidad.';o.hidden=false;return;}o.textContent='Gracias, hemos recibido vuestra solicitud. Os escribimos muy pronto.';o.hidden=false;});
+<footer><div style="display:grid;gap:8px"><span>© 2026 Lannex Lab · Talleres privados en español e inglés</span><nav class="lg"><a href="aviso-legal.html">Aviso legal</a><a href="privacidad.html">Privacidad</a><a href="cookies.html">Cookies</a></nav></div><nav><a href="empresas.html">Empresas</a><a href="navidad.html">Navidad</a><a href="particulares.html">Particulares</a><a href="agencias.html">Agencias y hoteles</a><a href="talleres.html">Talleres</a><a href="contacto.html">Contacto</a></nav></footer></main><script>var f=document.getElementById('form');if(f)f.addEventListener('submit',function(e){e.preventDefault();var o=document.getElementById('ok');if(!document.getElementById('f-privacidad').checked){o.textContent='Para enviar la solicitud, marca la casilla de la política de privacidad.';o.hidden=false;return;}
+var v=function(id){var x=document.getElementById(id);return x?x.value.trim():''};
+var body='Nombre: '+v('f-nombre')+'
+Email: '+v('f-email')+'
+Empresa o grupo: '+v('f-empresa')+'
+Ocasión: '+v('f-tipo')+'
+Personas: '+v('f-n')+'
+Idioma: '+v('f-idioma')+'
+Taller: '+v('f-taller')+'
+
+'+v('f-msg');
+location.href='mailto:lannexlab@gmail.com?subject='+encodeURIComponent('Solicitud de presupuesto: '+v('f-tipo'))+'&body='+encodeURIComponent(body);
+o.textContent='Se abrirá tu programa de correo con la solicitud preparada. Si no se abre, escríbenos a lannexlab@gmail.com.';o.hidden=false;});
 var q=new URLSearchParams(location.search).get('ocasion');if(q){var s=document.getElementById('f-tipo');if(s)for(var i=0;i<s.options.length;i++)if(s.options[i].text===q)s.selectedIndex=i;}</script></body></html>
