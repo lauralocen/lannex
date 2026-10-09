@@ -1,0 +1,137 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Particulares · Lannex Lab</title><meta name="description" content="Despedidas de soltera y soltero, cumpleaños y fiestas spa con amigas: talleres privados de perfumería y cosmética en Barcelona."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"><style>
+/* Layout: menú lateral fijo como etiqueta de laboratorio; contenido a la derecha con fotos a sangre */
+:root{--bg:#EEEDF1;--paper:#F8F7FA;--ink:#1B1A21;--muted:#62606C;--line:#D6D4DD;--amber:#B26A2C;--amber2:#E9D3BC;--sage:#56705F;--sage2:#D3DED6;--wine:#3B1F2B;
+--serif:"Cormorant Garamond",Garamond,Georgia,serif;--sans:"Manrope",Arial,sans-serif;--mono:"DM Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:400 16.5px/1.65 var(--sans)}
+img{max-width:100%;display:block}a{color:inherit}p{margin:0}h1,h2,h3,h4{margin:0;font-family:var(--serif);font-weight:500;line-height:1.02;text-wrap:balance}
+.lb{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:999px;background:var(--ink);color:var(--paper);text-decoration:none;font:600 .9rem var(--sans);border:1.5px solid var(--ink);cursor:pointer}
+.btn:hover{background:var(--amber);border-color:var(--amber)}.btn.o{background:transparent;color:var(--ink)}.btn.o:hover{background:var(--ink);color:var(--paper)}
+.btn.w{background:var(--paper);color:var(--ink);border-color:var(--paper)}.btn.w:hover{background:var(--amber2)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+/* Sidebar */
+.side{position:fixed;inset:0 auto 0 0;width:270px;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:28px 26px;z-index:20}
+.cell{display:inline-grid;grid-template-rows:auto 1fr auto;width:84px;aspect-ratio:1;border:1.5px solid var(--ink);padding:5px 7px;text-decoration:none}
+.cell small{font-family:var(--mono);font-size:.62rem}.cell b{font-family:var(--serif);font-weight:500;font-size:2.4rem;line-height:1;place-self:center}.cell i{font-style:normal;font-family:var(--mono);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.side .name{font-family:var(--serif);font-size:1.6rem;margin-top:14px}
+.side .tag{font-size:.82rem;color:var(--muted);margin-top:2px}
+.side nav{display:grid;margin-top:36px;border-top:1px solid var(--line)}
+.side nav a{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);text-decoration:none;font-weight:500}
+.side nav a span{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.side nav a:hover,.side nav a.on{color:var(--amber)}.side nav a.on span{color:var(--amber)}
+.side .bot{margin-top:auto;display:grid;gap:14px}
+.side .langs{display:flex;gap:6px}.side .langs span{font-family:var(--mono);font-size:.7rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+main{margin-left:270px}
+.mtop{display:none}
+@media(max-width:1000px){.side{display:none}main{margin-left:0}
+.mtop{display:flex;position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);align-items:center;justify-content:space-between;padding:10px 16px;gap:12px}
+.mtop .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--serif);font-size:1.3rem}.mtop .cell{width:44px}.mtop .cell b{font-size:1.2rem}.mtop .cell i{display:none}
+.mtop details{position:relative}.mtop summary{list-style:none;cursor:pointer;font:600 .85rem var(--sans);border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px}.mtop summary::-webkit-details-marker{display:none}
+.mtop details nav{position:absolute;right:0;top:calc(100% + 8px);background:var(--paper);border:1px solid var(--line);min-width:240px;display:grid;padding:6px 0;box-shadow:0 12px 30px rgba(0,0,0,.08)}
+.mtop details nav a{padding:12px 18px;text-decoration:none}.mtop details nav a.on{color:var(--amber)}}
+.wrap{padding-inline:clamp(16px,4vw,64px)}
+section{padding-block:clamp(64px,8vw,104px)}
+/* Hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;min-height:640px;padding:0}
+.hero .t{padding:clamp(40px,6vw,88px) clamp(16px,4vw,64px);display:flex;flex-direction:column;justify-content:center;gap:22px}
+.hero h1{font-size:clamp(3rem,6.4vw,5.6rem)}.hero h1 em{font-style:italic;color:var(--amber)}
+.hero p{max-width:50ch;color:var(--muted);font-size:1.08rem}
+.acts{display:flex;gap:12px;flex-wrap:wrap}
+.hero .ph{position:relative;min-height:380px}.hero .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .ph .lab{position:absolute;left:24px;bottom:24px;background:var(--paper);padding:14px 18px;max-width:280px;border:1px solid var(--line)}
+.lab b{display:block;font-family:var(--serif);font-size:1.25rem;font-weight:500}.lab p{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:4px;line-height:1.5}
+/* Page hero */
+.ph2{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;padding:0;background:var(--paper);border-bottom:1px solid var(--line)}
+.ph2 .t{padding:clamp(40px,6vw,80px) clamp(16px,4vw,64px);display:flex;flex-direction:column;justify-content:flex-end;gap:16px}
+.ph2 h1{font-size:clamp(2.6rem,5vw,4.4rem)}.ph2 p{color:var(--muted);max-width:52ch}
+.ph2 .im{min-height:360px;position:relative}.ph2 .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph2.dark{background:var(--wine);color:#F4ECE6;border:0}.ph2.dark p{color:#D3C2C8}.ph2.dark .lb{color:var(--amber2)}
+.ph2.dark .im{display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,rgba(233,211,188,.18),transparent 60%)}
+/* Section heads */
+.sh{display:grid;grid-template-columns:200px 1fr;gap:24px;margin-bottom:44px;align-items:start}
+.sh h2{font-size:clamp(2.2rem,4.2vw,3.4rem)}.sh p{color:var(--muted);margin-top:12px;max-width:56ch}
+/* Audience rows */
+.aud{display:grid;gap:18px}
+.ar{display:grid;grid-template-columns:120px 1.1fr 1fr;gap:28px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;text-decoration:none;padding-left:28px;transition:border-color .2s}
+.ar:hover{border-color:var(--ink)}
+.ar .n{font-family:var(--serif);font-size:4rem;line-height:1;color:var(--amber)}
+.ar h3{font-size:2.1rem}.ar p{color:var(--muted);margin-top:6px}.ar .go{font:600 .85rem var(--sans);margin-top:12px;display:inline-block}
+.ar .im{height:220px;position:relative}.ar .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ar.xm .im{background:var(--wine);display:grid;place-items:center;color:var(--amber2);font-family:var(--serif);font-size:4rem}
+/* Periodic */
+.pt{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.el{aspect-ratio:3/4;border-radius:12px;padding:12px;display:grid;grid-template-rows:auto 1fr auto auto;text-decoration:none;transition:transform .2s}
+.el:hover{transform:translateY(-4px)}
+.el small{font-family:var(--mono);font-size:.7rem}.el b{font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,4vw,3.4rem);line-height:1;place-self:center}
+.el span{font-weight:600;font-size:.9rem}.el i{font-style:normal;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;opacity:.75}
+.el.p{background:var(--amber2)}.el.c{background:var(--sage2)}
+.key{display:flex;gap:20px;margin-top:16px;flex-wrap:wrap}.key span{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:8px}.key i{width:14px;height:14px;border-radius:4px}
+/* Detailed workshops */
+.ws{display:grid;gap:0;border-top:1.5px solid var(--ink)}
+.w{display:grid;grid-template-columns:110px 1fr 1fr 220px;gap:28px;padding-block:26px;border-bottom:1px solid var(--line);align-items:start}
+.w .c2{width:110px;aspect-ratio:1;border-radius:14px;display:grid;grid-template-rows:auto 1fr;padding:8px 10px}
+.w .c2 small{font-family:var(--mono);font-size:.7rem}.w .c2 b{font-family:var(--serif);font-weight:500;font-size:3rem;line-height:1;place-self:center}
+.w.p .c2{background:var(--amber2)}.w.c .c2{background:var(--sage2)}
+.w h3{font-size:1.9rem}.w .cat{margin-bottom:6px}.w p{color:var(--muted)}
+.w .tk{font-size:.9rem;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px}.w .tk b{display:block;font-family:var(--mono);font-size:.68rem;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.grh{display:flex;align-items:baseline;gap:16px;margin:56px 0 18px}.grh:first-child{margin-top:0}.grh h2{font-size:2.4rem}
+/* Grids */
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+.box h3{font-size:1.6rem}.box p{color:var(--muted);margin-top:8px;font-size:.96rem}.box .lb{display:block;margin-bottom:10px}
+/* Split */
+.sp{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,64px);align-items:center}
+.sp .im{aspect-ratio:4/5;border-radius:20px;overflow:hidden}.sp .im img{width:100%;height:100%;object-fit:cover}
+.sp h2{font-size:clamp(2.2rem,4.2vw,3.4rem);margin-top:10px}.sp .in{color:var(--muted);margin-top:14px;max-width:52ch}
+.sp ul{list-style:none;padding:0;margin:22px 0 28px;display:grid;gap:10px}.sp li{display:flex;gap:12px}.sp li:before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-top:.6em}
+.sp.rev .im{order:2}
+/* Dark */
+.dk{background:var(--wine);color:#F4ECE6}.dk .lb{color:var(--amber2)}.dk p,.dk .sh p{color:#D3C2C8}
+.dk .box{background:rgba(255,255,255,.04);border-color:rgba(233,211,188,.25)}.dk .box h3{color:#F4ECE6}.dk .box p{color:#D3C2C8}
+.xg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.xg .x{border:1px solid rgba(233,211,188,.3);border-radius:14px;padding:20px}
+.xg .x .s{width:52px;height:52px;border-radius:10px;background:var(--amber2);color:var(--wine);display:grid;place-items:center;font-family:var(--serif);font-size:1.6rem}
+.xg .x .lb{display:block;margin-top:14px}.xg .x h4{font-size:1.5rem;margin-top:2px}.xg .x p{font-size:.92rem;margin-top:6px}
+.xg .cta{background:var(--amber2);color:var(--wine);border-radius:14px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;gap:16px}.xg .cta p{color:var(--wine);font-family:var(--serif);font-size:1.6rem;line-height:1.1}
+/* Steps */
+.st{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.st div{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+.st b{font-family:var(--mono);font-weight:500;font-size:.8rem;color:var(--amber)}.st h3{font-size:1.5rem;margin-top:10px}.st p{color:var(--muted);font-size:.94rem;margin-top:6px}
+/* Team */
+.tm{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tm .box{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:start}
+.tm .cell{width:72px}.tm .cell b{font-size:1.9rem}
+.tm .r{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin-top:4px}
+/* FAQ */
+.fq{display:grid;grid-template-columns:200px 1fr;gap:24px}
+details.f{border-bottom:1px solid var(--line);padding-block:18px}details.f:first-child{border-top:1px solid var(--line)}
+details.f summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;font-family:var(--serif);font-size:1.45rem;font-weight:500}
+details.f summary::-webkit-details-marker{display:none}details.f summary:after{content:"+";font-family:var(--mono);color:var(--amber)}details.f[open] summary:after{content:"−"}
+details.f p{color:var(--muted);margin-top:8px;max-width:64ch}
+/* CTA */
+.cta2{margin:0 clamp(16px,4vw,64px);border-radius:24px;background:var(--ink);color:var(--paper);padding:clamp(36px,6vw,72px);display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+.cta2 h2{font-size:clamp(2rem,4vw,3.2rem)}.cta2 p{color:#B7B4C0;margin-top:10px;max-width:50ch}
+.cwrap{padding-block:clamp(48px,6vw,80px)}
+/* Form */
+.ct{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(28px,5vw,64px)}
+.ct h1{font-size:clamp(2.6rem,5vw,4.2rem);margin-top:10px}.ct dl{margin:28px 0 0;display:grid;gap:14px}.ct dt{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;color:var(--muted)}.ct dd{margin:2px 0 0;font-family:var(--serif);font-size:1.5rem}
+form{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,3vw,32px)}form .full{grid-column:1/-1}
+label{display:grid;gap:6px;font-size:.85rem;font-weight:600}
+input,select,textarea{font:inherit;font-weight:400;width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--ink)}textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--amber)}#ok{color:var(--sage);font-weight:600}
+footer{padding:40px clamp(16px,4vw,64px);border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;color:var(--muted);font-size:.9rem}
+footer nav{display:flex;gap:18px;flex-wrap:wrap}footer a{text-decoration:none}
+@media(max-width:1200px){.pt{grid-template-columns:repeat(4,minmax(0,1fr))}.w{grid-template-columns:90px 1fr 1fr}.w .tk{grid-column:2/-1}.w .c2{width:90px}}
+@media(max-width:1000px){.xg{grid-template-columns:repeat(2,minmax(0,1fr))}.st{grid-template-columns:1fr 1fr}.tm{grid-template-columns:1fr}}
+@media(max-width:860px){.hero,.ph2,.sp,.ct{grid-template-columns:1fr}.sp.rev .im{order:0}.sp .im{aspect-ratio:4/3}.sh,.fq{grid-template-columns:1fr;gap:6px}
+.ar{grid-template-columns:1fr;padding-left:0}.ar>div:not(.im){padding:0 22px}.ar .n{padding:22px 22px 0;font-size:3rem}.ar>div:nth-child(2){padding-bottom:4px}.ar .im{order:-1;height:200px}
+.g3{grid-template-columns:1fr 1fr}.cta2{grid-template-columns:1fr}.w{grid-template-columns:72px 1fr}.w .c2{width:72px}.w .c2 b{font-size:2.2rem}.w>p,.w .tk{grid-column:1/-1}}
+@media(max-width:560px){.pt.rec{grid-template-columns:repeat(2,minmax(0,1fr))!important}.pt{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g2,.xg,.st{grid-template-columns:1fr}form{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style></head><body>
+<aside class="side"><a class="cell" href="index.html" aria-label="Lannex Lab, inicio"><small>3</small><b>Lx</b><i>Lannex</i></a><p class="name">Lannex Lab</p><p class="tag">Talleres privados de perfumería y cosmética</p><nav aria-label="Menú"><a href="index.html">Inicio<span>00</span></a><a href="empresas.html">Empresas<span>01</span></a><a href="navidad.html">Navidad<span>02</span></a><a href="particulares.html" class=on>Particulares<span>03</span></a><a href="agencias.html">Agencias y hoteles<span>04</span></a><a href="talleres.html">Talleres<span>05</span></a><a href="contacto.html">Contacto<span>06</span></a></nav>
+<div class="bot"><div class="langs"><span>ES</span><span>EN</span></div><p class="lb" style="text-transform:none;letter-spacing:0">Bajo demanda · Barcelona</p><a class="btn" href="contacto.html">Pedir presupuesto</a></div></aside>
+<div class="mtop"><a class="logo" href="index.html"><span class="cell"><small>3</small><b>Lx</b></span>Lannex Lab</a><details><summary>Menú</summary><nav aria-label="Menú móvil"><a href="index.html">Inicio</a><a href="empresas.html">Empresas</a><a href="navidad.html">Navidad</a><a href="particulares.html" class=on>Particulares</a><a href="agencias.html">Agencias y hoteles</a><a href="talleres.html">Talleres</a><a href="contacto.html">Contacto</a></nav></details></div>
+<main><section class="ph2"><div class="t"><p class="lb">03 · Particulares</p><h1>Un plan para celebrar juntos</h1><p>Organizamos el taller en casa, en un local o en el espacio que elijáis, solo para vuestro grupo. Os adaptamos el taller y los aromas a lo que celebráis.</p></div><div class="im"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1400&q=80" alt=""></div></section><section class="wrap"><div class="sh"><p class="lb">Ocasiones</p><div><h2>¿Qué celebráis?</h2></div></div><div class="g3"><div class="box"><h3>Despedidas de soltera y soltero</h3><p>Taller privado y fragancia especial para el protagonista.</p></div><div class="box"><h3>Cumpleaños</h3><p>Sobre todo los de cifra redonda: 30, 40, 50…</p></div><div class="box"><h3>Grupos de amigos</h3><p>Un plan distinto para quedar.</p></div><div class="box"><h3>Baby showers</h3><p>Una actividad tranquila para celebrar a la futura mamá.</p></div><div class="box"><h3>Parejas</h3><p>San Valentín, aniversarios o un plan para dos parejas o más.</p></div><div class="box"><h3>Fiestas spa con amigas</h3><p>Crema, aceite corporal, bruma y blush para cumpleaños juveniles y despedidas de soltera.</p></div></div></section><section class="wrap"><div class="sp"><div class="im"><img src="https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1100&q=80" alt="" loading="lazy"></div><div><p class="lb">Fiestas spa</p><h2>Una tarde de spa con amigas</h2><p class="in">Montamos un pequeño spa donde estéis: cada una crea su crema, su aceite corporal, su bruma o su blush, y se lo lleva a casa.</p><ul><li><span><b>Cumpleaños juveniles</b>. un plan tranquilo y creativo, siempre con un adulto responsable del grupo</span></li><li><span><b>Despedidas de soltera</b>. una versión más relajada, con mezclas pensadas para la novia</span></li><li><span><b>Combinable</b>. elegid uno o dos productos en la misma tarde</span></li><li><span><b>Lo llevamos todo</b>. bases, aromas, envases y decoración de la mesa</span></li></ul><a class="btn" href="contacto.html?ocasion=Fiesta%20spa%20con%20amigas">Organizar fiesta spa →</a></div></div></section><section class="wrap"><div class="sp rev"><div class="im"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1100&q=80" alt="" loading="lazy"></div><div><p class="lb">Despedidas</p><h2>Una despedida con algo que llevarse a casa</h2><p class="in">Un plan para reír, probar olores y crear juntos. Preparamos una fragancia especial para la novia o el novio, o cada invitado hace la suya.</p><ul><li><span><b>Privado</b>. solo para vuestro grupo</span></li><li><span><b>A vuestro ritmo</b>. nos adaptamos al resto del plan del día</span></li></ul><a class="btn" href="contacto.html?ocasion=Despedida%20de%20soltera%20/%20soltero">Organizar despedida →</a></div></div></section><section class="wrap"><div class="sh"><p class="lb">Recomendados</p><div><h2>Talleres que más encajan</h2><p>Podéis elegir cualquiera de los siete talleres. Estos son los que más piden grupos como el vuestro.</p></div></div><div class="pt rec" style="grid-template-columns:repeat(5,minmax(0,140px))"><a class="el p" href="talleres.html#pf"><small>1</small><b>Pf</b><span>Perfume</span></a><a class="el p" href="talleres.html#br"><small>2</small><b>Br</b><span>Bruma</span></a><a class="el c" href="talleres.html#cr"><small>5</small><b>Cr</b><span>Crema</span></a><a class="el c" href="talleres.html#bl"><small>6</small><b>Bl</b><span>Blush</span></a><a class="el c" href="talleres.html#ac"><small>7</small><b>Ac</b><span>Aceite corporal</span></a></div></section><section class="wrap"><div class="sh"><p class="lb">Cómo funciona</p><div><h2>Todo bajo demanda</h2><p>No hay fechas fijas: organizamos cada taller para vuestro grupo.</p></div></div><div class="st"><div><b>Paso 01</b><h3>Nos escribís</h3><p>Qué celebráis, cuántos sois, idioma y fecha aproximada.</p></div><div><b>Paso 02</b><h3>Os enviamos propuesta</h3><p>Taller, aromas, duración y presupuesto cerrado.</p></div><div><b>Paso 03</b><h3>Llevamos todo</h3><p>Materias primas, frascos, etiquetas y todo lo necesario al lugar que elijáis.</p></div><div><b>Paso 04</b><h3>Creáis y os lo lleváis</h3><p>Cada persona sale con su creación envasada y con su nombre.</p></div></div></section><section class="wrap" style="background:var(--paper)"><div class="fq"><p class="lb">Preguntas frecuentes</p><div><details class=f><summary>¿Tenéis talleres abiertos con fecha?</summary><p>No. Todos los talleres son privados y bajo demanda. Nos escribís, elegimos fecha juntos y el taller es solo para vuestro grupo.</p></details><details class=f><summary>¿Hace falta saber algo de perfumería?</summary><p>No. El taller empieza desde cero y está pensado para cualquier persona.</p></details><details class=f><summary>¿Dónde se hace el taller?</summary><p>Vamos a vuestra oficina, hotel, restaurante, casa o al espacio que elijáis en Barcelona y alrededores. Solo necesitamos mesas y un sitio ventilado.</p></details><details class=f><summary>¿Para cuántas personas?</summary><p>Contadnos cuántos sois y os proponemos el formato. Con grupos grandes hacemos varios turnos.</p></details><details class=f><summary>Alguien del grupo tiene alergias o piel sensible</summary><p>Avisadnos al reservar y os diremos con antelación qué materias primas vamos a usar.</p></details></div></div></section><div class="cwrap"><div class="cta2"><div><h2>Contadnos qué celebráis</h2><p>Os respondemos en menos de 24 horas con una propuesta para vuestro grupo.</p></div><a class="btn w" href="contacto.html?ocasion=Cumpleaños">Pedir presupuesto →</a></div></div>
+<footer><span>© 2026 Lannex Lab · Talleres privados en español e inglés</span><nav><a href="empresas.html">Empresas</a><a href="navidad.html">Navidad</a><a href="particulares.html">Particulares</a><a href="agencias.html">Agencias y hoteles</a><a href="talleres.html">Talleres</a><a href="contacto.html">Contacto</a></nav></footer></main><script>var f=document.getElementById('form');if(f)f.addEventListener('submit',function(e){e.preventDefault();var o=document.getElementById('ok');o.textContent='Gracias, hemos recibido vuestra solicitud. Os escribimos muy pronto.';o.hidden=false;});
+var q=new URLSearchParams(location.search).get('ocasion');if(q){var s=document.getElementById('f-tipo');if(s)for(var i=0;i<s.options.length;i++)if(s.options[i].text===q)s.selectedIndex=i;}</script></body></html>
