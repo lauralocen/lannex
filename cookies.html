@@ -171,7 +171,7 @@ footer .lg{display:flex;gap:18px;flex-wrap:wrap}
 <p>Esta web <b>no instala cookies</b>: no usamos cookies propias ni de terceros con fines de análisis, publicidad o personalización. Por eso no mostramos un aviso para aceptarlas.</p>
 <h2>3. Recursos de terceros</h2>
 <p>Para mostrar la web cargamos recursos de otros servicios. No instalan cookies, pero al cargarlos tu navegador comunica tu dirección IP a esos servicios:</p>
-<ul><li>Google Fonts (tipografías), de Google.</li><li>Unsplash (algunas fotografías).</li><li>GitHub Pages (alojamiento de la web).</li></ul>
+<ul><li>Google Fonts (tipografías), de Google.</li><li>Unsplash (algunas fotografías).</li><li>GitHub Pages (alojamiento de la web).</li><li>GoatCounter (estadísticas de visitas). Cuenta las visitas de forma anónima y agregada, sin cookies y sin guardar tu dirección IP.</li></ul>
 <h2>4. Cambios</h2>
 <p>Si en el futuro añadimos herramientas de análisis u otras que usen cookies, actualizaremos esta política y te pediremos el consentimiento antes de instalarlas.</p>
 <h2>5. Cómo gestionar las cookies</h2>
@@ -186,4 +186,4 @@ fetch('https://formspree.io/f/mrpeadgg',{method:'POST',headers:{'Content-Type':'
 .then(function(r){if(!r.ok)throw 0;f.reset();o.textContent='¡Gracias! Hemos recibido vuestra solicitud y os responderemos en menos de 24 horas.';o.hidden=false;})
 .catch(function(){o.style.color='#B4432F';o.textContent='No se ha podido enviar. Escríbenos por WhatsApp al 616 09 45 87 o a lannexlab@gmail.com.';o.hidden=false;})
 .finally(function(){btn.disabled=false;btn.textContent='Pedir presupuesto';});});
-var q=new URLSearchParams(location.search).get('ocasion');if(q){var s=document.getElementById('f-tipo');if(s)for(var i=0;i<s.options.length;i++)if(s.options[i].text===q)s.selectedIndex=i;}</script></body></html>
+var q=new URLSearchParams(location.search).get('ocasion');if(q){var s=document.getElementById('f-tipo');if(s)for(var i=0;i<s.options.length;i++)if(s.options[i].text===q)s.selectedIndex=i;}</script><script data-goatcounter="https://lannexlab.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script></body></html>
