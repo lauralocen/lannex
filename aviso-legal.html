@@ -74,6 +74,14 @@ body.xmas footer{border-top-color:var(--line)}
 .pal h3{font-size:1.6rem;color:var(--amber)}.pal p{color:var(--muted);margin-top:8px;font-size:.95rem}
 @media(max-width:1100px){.pal{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:620px){.pal{grid-template-columns:1fr 1fr}}@media(max-width:420px){.pal{grid-template-columns:1fr}}
 body.xmas section.wrap{padding-block:clamp(40px,5vw,64px)}body.xmas section.wrap.xs:first-of-type{padding-top:clamp(72px,9vw,112px)}body.xmas .divx{margin-block:4px}
+body.xmas .ph2{grid-template-columns:1.25fr .75fr;align-items:center}
+body.xmas .ph2 .im{min-height:0;width:min(330px,80vw);height:auto;aspect-ratio:1;margin:90px auto 40px;border-radius:50%;overflow:visible;position:relative;box-shadow:0 24px 50px rgba(0,0,0,.45)}
+body.xmas .ph2 .im img{border-radius:50%;border:3px solid #D9AE5F}
+body.xmas .ph2 .im:after{inset:0;border:0;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.5) 0,rgba(255,255,255,.1) 18%,transparent 40%),radial-gradient(circle at 70% 85%,transparent 55%,rgba(30,10,18,.45) 100%)}
+body.xmas .ph2 .im:before{content:"";position:absolute;z-index:2;top:-30px;left:50%;transform:translateX(-50%);width:58px;height:34px;border-radius:7px 7px 3px 3px;background:linear-gradient(90deg,#9A7230,#F1D9A0 45%,#B98C3E);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.cord{position:absolute;z-index:1;top:-90px;left:50%;width:1.5px;height:62px;background:linear-gradient(#D9AE5F,#F1D9A0)}
+.ring{position:absolute;z-index:3;top:-44px;left:50%;transform:translateX(-50%);width:20px;height:20px;border:3px solid #E7C97F;border-radius:50%}
+@media(max-width:860px){body.xmas .ph2{grid-template-columns:1fr}body.xmas .ph2 .im{margin:90px auto 48px}}
 /* Sidebar */
 .side{position:fixed;inset:0 auto 0 0;width:270px;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:24px 26px;z-index:20;overflow-y:auto}
 .cell{display:inline-grid;grid-template-rows:auto 1fr auto;width:84px;aspect-ratio:1;border:1.5px solid var(--ink);padding:5px 7px;text-decoration:none}
