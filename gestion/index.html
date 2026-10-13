@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Gestión · Lannex Lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%231B1A21'/%3E%3Ctext x='32' y='43' font-family='Georgia' font-size='30' fill='%23F6F3EE' text-anchor='middle'%3ELx%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#1B1A21">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lannex"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#EEEDF1;--paper:#F8F7FA;--ink:#1B1A21;--muted:#66636F;--line:#D9D6DF;--amber:#B26A2C;--amber2:#E9D3BC;--sage:#4F7A62;--sage2:#D3DED6;--wine:#3B1F2B;--red:#A33A3A;--red2:#F2D9D6;--blue2:#DCE3F0;
+--serif:"Cormorant Garamond",Georgia,serif;--sans:Manrope,system-ui,sans-serif;--mono:"DM Mono",ui-monospace,monospace}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0;line-height:1.1}
+a{color:var(--amber)}
+.lb{font:500 .7rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+#login .card{width:min(380px,100%);background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:32px}
+.logo{display:inline-grid;place-items:center;width:56px;height:56px;border:1.5px solid var(--ink);border-radius:8px;background:#FBF8F2;font:500 1.9rem var(--serif);position:relative}
+.logo small{position:absolute;top:2px;left:5px;font:700 .6rem var(--mono)}
+#login h1{font-size:2rem;margin:18px 0 4px}#login p{color:var(--muted);margin:0 0 20px}
+/* layout */
+#app{display:none}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{background:var(--ink);color:#F6F3EE;padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.side .brand{display:flex;gap:12px;align-items:center;padding:0 8px}.side .brand .logo{width:42px;height:42px;font-size:1.4rem;color:var(--ink)}
+.side .brand b{display:block;font:600 .9rem var(--sans);letter-spacing:.14em}.side .brand span{font:500 .65rem var(--mono);color:var(--amber2);letter-spacing:.14em}
+.side nav{display:grid;gap:2px}
+.side nav button{all:unset;cursor:pointer;padding:9px 12px;border-radius:10px;display:flex;gap:10px;align-items:center;font-size:.92rem;color:#D8D5DE}
+.side nav button:hover{background:#2A2932}.side nav button.on{background:#F6F3EE;color:var(--ink);font-weight:600}
+.side nav button .ct{margin-left:auto;font:500 .7rem var(--mono);background:var(--amber);color:#fff;border-radius:99px;padding:1px 7px}
+.side .foot{margin-top:auto;font-size:.8rem;color:#A9A6B0;padding:0 8px}.side .foot button{all:unset;cursor:pointer;text-decoration:underline}
+.top{display:none}
+main{padding:28px clamp(16px,3vw,40px) 80px;min-width:0}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.ph h1{font-size:2.4rem}.ph p{margin:4px 0 0;color:var(--muted)}
+.demo{background:var(--amber2);border-radius:12px;padding:10px 14px;margin-bottom:18px;font-size:.88rem}
+/* ui */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;font-weight:600;font-size:.88rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.o{background:transparent;color:var(--ink)}.btn.s{padding:6px 12px;font-size:.8rem}.btn.r{background:var(--red);border-color:var(--red)}.btn.g{background:var(--sage);border-color:var(--sage)}
+.btn.a{background:var(--amber);border-color:var(--amber)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi .v{font:500 2.1rem var(--serif);margin-top:4px}.kpi .s{font-size:.8rem;color:var(--muted)}
+.card h2{font-size:1.5rem;margin-bottom:10px}
+.list{display:grid;gap:8px}
+.it{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+.it:hover{border-color:var(--amber)}.it .m{flex:1;min-width:0}.it .m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.it .m span{font-size:.82rem;color:var(--muted)}
+.date{width:46px;text-align:center;border-radius:10px;background:var(--ink);color:#fff;padding:4px 0;flex:none}.date b{display:block;font:500 1.3rem var(--serif);line-height:1}.date span{font:500 .6rem var(--mono);text-transform:uppercase}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.72rem;font-weight:600;background:var(--bg);white-space:nowrap}
+.t-lead{background:var(--blue2)}.t-presupuesto{background:var(--amber2)}.t-confirmado{background:var(--sage2)}.t-realizado{background:#1B1A21;color:#fff}.t-perdido{background:var(--red2);color:var(--red)}
+.t-pend{background:var(--red2);color:var(--red)}.t-ok{background:var(--sage2);color:#2F5A42}
+.empty{color:var(--muted);font-size:.9rem;padding:8px 2px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{font:500 .68rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+tr.cl{cursor:pointer}tr.cl:hover td{background:#fff}
+.tw{overflow-x:auto}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters input,.filters select{padding:8px 12px;border:1px solid var(--line);border-radius:99px;background:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:.82rem;cursor:pointer}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* forms */
+.f{display:grid;gap:12px}.f .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.f .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+label.fl{display:grid;gap:4px;font-size:.78rem;font-weight:600;color:var(--muted)}
+.f input,.f select,.f textarea,input.in,select.in,textarea.in{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:.92rem;font-weight:400;color:var(--ink)}
+.f textarea{min-height:70px;resize:vertical}
+.ck{display:flex;gap:8px;align-items:center;font-size:.9rem;font-weight:500;color:var(--ink)}
+.sec{font:500 .7rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}
+/* drawer */
+#ov{position:fixed;inset:0;background:rgba(27,26,33,.45);display:none;z-index:40}
+#dr{position:fixed;top:0;right:0;height:100%;width:min(680px,100%);background:var(--bg);z-index:50;transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column}
+#dr.open{transform:none}#ov.open{display:block}
+#dr .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--paper)}
+#dr .hd h2{font-size:1.7rem}#dr .bd{padding:18px 20px 40px;overflow:auto;flex:1}
+.x{all:unset;cursor:pointer;font-size:1.6rem;line-height:1;padding:4px 8px}
+.tot{display:grid;gap:4px;justify-content:end;text-align:right;font-variant-numeric:tabular-nums}.tot b{font:600 1.3rem var(--serif)}
+.lines .ln{display:grid;grid-template-columns:minmax(0,1fr) 110px 70px 80px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.lines .ln input,.lines .ln select{padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;width:100%}
+.del{all:unset;cursor:pointer;color:var(--red);font-size:1.2rem;text-align:center}
+.tl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.tl label{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px;font-size:.78rem;text-align:center;cursor:pointer}
+.tl input{display:none}.tl label:has(input:checked){background:var(--amber2);border-color:var(--amber)}.tl label b{display:block;font:500 1.2rem var(--serif)}
+.tl label.c:has(input:checked){background:var(--sage2);border-color:var(--sage)}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal .dh{font:500 .66rem var(--mono);text-transform:uppercase;color:var(--muted);text-align:center;padding:4px}
+.cal .d{min-height:96px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px;font-size:.75rem}
+.cal .d.out{opacity:.4}.cal .d.today{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.cal .d .n{font:600 .8rem var(--mono)}.cal .ev{display:block;margin-top:3px;border-radius:6px;padding:2px 5px;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--amber)}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;font-size:.88rem;transition:transform .2s;z-index:60}
+#toast.show{transform:translateX(-50%)}
+#print{display:none}
+@media(max-width:900px){
+ .layout{grid-template-columns:1fr}.side{position:fixed;left:0;top:0;width:260px;z-index:45;transform:translateX(-100%);transition:transform .2s}.side.open{transform:none}
+ .top{display:flex;position:sticky;top:0;z-index:30;background:var(--ink);color:#fff;padding:10px 14px;align-items:center;justify-content:space-between}
+ .top button{all:unset;cursor:pointer;font-size:1.4rem;padding:2px 6px}
+ .g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g2{grid-template-columns:1fr}
+ .ph h1{font-size:2rem}.f .two,.f .three{grid-template-columns:1fr}
+ .lines .ln{grid-template-columns:minmax(0,1fr) 90px 56px 70px 24px}
+ .cal .d{min-height:64px;font-size:.66rem;padding:4px}.tl{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .hide-m{display:none}
+}
+@media print{
+ body.printing #app,body.printing #login,body.printing #dr,body.printing #ov,body.printing #toast{display:none!important}
+ body.printing #print{display:block}body.printing{background:#fff}
+ @page{size:A4;margin:16mm}
+}
+.doc{font:400 10.5pt/1.5 var(--sans);color:#1B1A21}
+.doc .dh2{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1B1A21;padding-bottom:14px;margin-bottom:18px}
+.doc h1{font:500 28pt var(--serif)}.doc .meta{text-align:right;font-size:9.5pt}
+.doc .who{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:18px;font-size:9.5pt}
+.doc table th{color:#555}.doc .tt{margin-top:14px;margin-left:auto;width:260px}.doc .tt div{display:flex;justify-content:space-between;padding:3px 0}.doc .tt .g{border-top:2px solid #1B1A21;font-weight:700;font-size:12pt;padding-top:6px}
+.doc .nt{margin-top:22px;font-size:9pt;color:#444;white-space:pre-wrap}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="card">
+    <span class="logo"><small>3</small>Lx</span>
+    <h1>Gestión Lannex</h1>
+    <p>Acceso privado del equipo</p>
+    <form class="f" onsubmit="doLogin(event)">
+      <label class="fl">Email<input type="email" id="l-email" autocomplete="username" required></label>
+      <label class="fl">Contraseña<input type="password" id="l-pass" autocomplete="current-password" required></label>
+      <button class="btn" type="submit" style="justify-content:center">Entrar</button>
+      <p id="l-err" style="color:var(--red);font-size:.85rem;margin:0;display:none"></p>
+    </form>
+  </div>
+</div>
+
+<div id="app">
+  <div class="top"><button onclick="toggleSide()" aria-label="Menú">☰</button><b style="letter-spacing:.14em">LANNEX LAB</b><button onclick="newTaller()" aria-label="Nuevo taller">＋</button></div>
+  <div class="layout">
+    <aside class="side" id="side">
+      <div class="brand"><span class="logo"><small>3</small>Lx</span><div><b>LANNEX LAB</b><span>GESTIÓN</span></div></div>
+      <nav id="nav"></nav>
+      <div class="foot"><div id="who"></div><button onclick="logout()">Cerrar sesión</button></div>
+    </aside>
+    <main id="main"></main>
+  </div>
+</div>
+<div id="ov" onclick="closeDr()"></div>
+<div id="dr"><div class="hd"><h2 id="dr-t"></h2><button class="x" onclick="closeDr()" aria-label="Cerrar">×</button></div><div class="bd" id="dr-b"></div></div>
+<div id="toast"></div>
+<div id="print"></div>
+
+<script>
+/* ================================================================
+   CONFIGURACIÓN
+   Pega aquí los datos de vuestro proyecto de Supabase (Project Settings → API).
+   Si se dejan vacíos, la app funciona en MODO PRUEBA: los datos solo se
+   guardan en este navegador.
+   ================================================================ */
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+
+/* ---------------- datos fijos ---------------- */
+const TALLERES=[["Pf","Perfume","p"],["Br","Bruma","p"],["Am","Ambientador de coche","p"],["Mk","Mikado","p"],["Ac","Aceite corporal","p"],["Cr","Crema","c"],["Bl","Blush","c"],["Ex","Exfoliante","c"],["Lb","Labial","c"],["Bc","Bálsamo con color","c"]];
+const TNAME=Object.fromEntries(TALLERES.map(t=>[t[0],t[1]]));
+const ESTADOS=[["lead","Nuevo contacto"],["presupuesto","Presupuesto enviado"],["confirmado","Confirmado"],["realizado","Realizado"],["perdido","Perdido / cancelado"]];
+const ENAME=Object.fromEntries(ESTADOS);
+const OCASIONES=["Teambuilding","Cena de Navidad","Jornada de equipo o convención","Evento para clientes o de marca","Formación en marketing olfativo","Despedida de soltera / soltero","Cumpleaños de adultos","Cumpleaños de adolescentes","Fiesta spa con amigas","Baby shower","Parejas y grupos de amigos","Agencia, hotel o restaurante","Otro"];
+const TIPOS=[["empresa","Empresa"],["particular","Particular"],["agencia","Agencia / hotel / restaurante"]];
+const ORIGENES=["Formulario web","WhatsApp","Instagram","Email","Recomendación","Agencia","Google","Otro"];
+const CAT_GASTO=["Materiales","Envases y packaging","Espacio / alquiler","Transporte","Publicidad","Web y herramientas","Gestoría e impuestos","Otros"];
+const CAT_MAT=["Bases","Aceites esenciales y aromas","Envases","Etiquetas","Packaging","Material de trabajo","Otros"];
+const METODOS=["Transferencia","Bizum","Efectivo","Tarjeta"];
+
+const DEF_AJUSTES={
+  empresa:{nombre:"Lannex Lab",titular:"Cristina del Pilar Portillo Macho",nif:"",direccion:"",email:"lannexlab@gmail.com",telefono:"616 09 45 87",web:"lannexlab.com",iban:""},
+  iva:21, validez:15, equipo:["Alex","Anna","Laura"], meta:0,
+  tarifas:Object.fromEntries(TALLERES.map(t=>[t[0],{empresa:60,particular:60,coste:0}])),
+  extras:[
+    {nombre:"Caja regalo",modo:"persona",precio:0},
+    {nombre:"Etiquetas personalizadas / con logo",modo:"persona",precio:0},
+    {nombre:"Envase o soporte premium",modo:"persona",precio:0},
+    {nombre:"Fragancia del equipo / del protagonista",modo:"fijo",precio:0},
+    {nombre:"Segundo taller",modo:"persona",precio:0},
+    {nombre:"Decoración de la mesa",modo:"fijo",precio:0},
+    {nombre:"Desplazamiento",modo:"fijo",precio:0}],
+  notaPresupuesto:"Presupuesto sin compromiso. Para reservar la fecha os pedimos confirmación por escrito.\nIncluye materias primas, material de trabajo, envases estándar, guía del equipo y montaje y recogida.",
+  notaFactura:"Gracias por confiar en Lannex Lab.",
+  plantillas:[
+    {nombre:"Primera respuesta",texto:"¡Hola {nombre}! Somos Lannex Lab, gracias por escribirnos 😊 Para prepararos una propuesta, ¿nos decís fecha aproximada, número de personas, dónde os gustaría hacerlo y qué taller os apetece?"},
+    {nombre:"Envío de presupuesto",texto:"Hola {nombre}, os enviamos el presupuesto para el taller de {taller} del {fecha} para {personas} personas: {total}. Cualquier duda nos decís. ¡Un abrazo!"},
+    {nombre:"Seguimiento presupuesto",texto:"Hola {nombre}, ¿pudisteis ver el presupuesto del taller de {taller}? Si queréis ajustar algo (personas, extras o duración) lo adaptamos sin problema."},
+    {nombre:"Confirmación de reserva",texto:"¡Hecho, {nombre}! Taller de {taller} confirmado el {fecha} a las {hora} en {lugar}, para {personas} personas. Llegaremos 30 minutos antes para montar. Si alguien tiene alergias o piel sensible, avisadnos."},
+    {nombre:"Recordatorio día antes",texto:"¡Hola {nombre}! Mañana nos vemos a las {hora} en {lugar} para el taller de {taller}. Necesitamos mesas, sillas y un sitio ventilado. ¡Qué ganas!"},
+    {nombre:"Después del taller",texto:"¡Gracias por el taller de ayer, {nombre}! Esperamos que os encante lo que creasteis. Si os apetece, nos ayudaría mucho una reseña en Google o que nos etiquetéis en Instagram @lannexlab 💛"}]
+};
+
+/* ---------------- almacenamiento ---------------- */
+const DEMO=!SUPABASE_URL||!SUPABASE_ANON_KEY;
+const sb=(!DEMO&&window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const KINDS=["cliente","taller","doc","gasto","material","proveedor","tarea","ajustes"];
+const D={};KINDS.forEach(k=>D[k]=[]);
+let AJ=structuredClone(DEF_AJUSTES);let USER="";
+const LS="lannex_gestion_v1";
+function lsGet(){try{return JSON.parse(localStorage.getItem(LS)||"[]")}catch(e){return[]}}
+function lsSet(a){try{localStorage.setItem(LS,JSON.stringify(a))}catch(e){toast("No se pudo guardar en este navegador")}}
+async function loadAll(){
+  let rows=[];
+  if(DEMO){rows=lsGet()}
+  else{
+    let from=0;for(;;){const {data,error}=await sb.from("lannex_items").select("id,kind,data").range(from,from+999);if(error){toast("Error cargando: "+error.message);break}rows=rows.concat(data);if(data.length<1000)break;from+=1000}
+  }
+  KINDS.forEach(k=>D[k]=[]);
+  rows.forEach(r=>{if(D[r.kind])D[r.kind].push({...r.data,id:r.id})});
+  const a=D.ajustes[0];AJ=a?deepMerge(structuredClone(DEF_AJUSTES),a):structuredClone(DEF_AJUSTES);
+}
+function deepMerge(base,o){for(const k in o){if(o[k]&&typeof o[k]==="object"&&!Array.isArray(o[k])&&base[k]&&typeof base[k]==="object")deepMerge(base[k],o[k]);else base[k]=o[k]}return base}
+function uid(){return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))}
+async function save(kind,obj){
+  if(!obj.id)obj.id=uid();obj._upd=new Date().toISOString();obj._by=USER;
+  const {id,...data}=obj;
+  if(DEMO){const a=lsGet();const i=a.findIndex(r=>r.id===id);const row={id,kind,data};if(i>=0)a[i]=row;else a.push(row);lsSet(a)}
+  else{const {error}=await sb.from("lannex_items").upsert({id,kind,data,updated_by:USER});if(error){toast("Error guardando: "+error.message);throw error}}
+  const arr=D[kind];const i=arr.findIndex(x=>x.id===id);if(i>=0)arr[i]=obj;else arr.push(obj);
+  if(kind==="ajustes")AJ=deepMerge(structuredClone(DEF_AJUSTES),obj);
+  return obj;
+}
+async function del(kind,id){
+  if(DEMO){lsSet(lsGet().filter(r=>r.id!==id))}
+  else{const {error}=await sb.from("lannex_items").delete().eq("id",id);if(error){toast("Error borrando: "+error.message);throw error}}
+  D[kind]=D[kind].filter(x=>x.id!==id);
+}
+
+/* ---------------- login ---------------- */
+async function doLogin(e){
+  e.preventDefault();const err=document.getElementById("l-err");err.style.display="none";
+  const {error}=await sb.auth.signInWithPassword({email:val("l-email"),password:val("l-pass")});
+  if(error){err.textContent="Email o contraseña incorrectos";err.style.display="block";return}
+  start();
+}
+async function logout(){if(sb)await sb.auth.signOut();location.reload()}
+async function start(){
+  if(!DEMO){const {data}=await sb.auth.getSession();if(!data.session){show("login");return}USER=data.session.user.email}
+  else USER="modo prueba";
+  show("app");document.getElementById("who").textContent=USER;
+  await loadAll();go(location.hash.slice(1)||"resumen");
+}
+function show(id){document.getElementById("login").style.display=id==="login"?"grid":"none";document.getElementById("app").style.display=id==="app"?"block":"none"}
+
+/* ---------------- utilidades ---------------- */
+const $=s=>document.querySelector(s);
+function val(id){const e=document.getElementById(id);return e?e.value.trim():""}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function eur(n){return (Number(n)||0).toLocaleString("es-ES",{style:"currency",currency:"EUR"})}
+function num(v){const n=parseFloat(String(v).replace(",","."));return isNaN(n)?0:n}
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fd(s,opt){if(!s)return"";const d=new Date(s+"T12:00:00");return d.toLocaleDateString("es-ES",opt||{day:"numeric",month:"short",year:"numeric"})}
+function daysTo(s){if(!s)return 9999;return Math.round((new Date(s+"T12:00:00")-new Date(today()+"T12:00:00"))/864e5)}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2300)}
+function opts(list,sel,empty){return (empty!==undefined?`<option value="">${empty}</option>`:"")+list.map(o=>{const [v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}" ${String(v)===String(sel??"")?"selected":""}>${esc(l)}</option>`}).join("")}
+function readForm(root){const o={};root.querySelectorAll("[name]").forEach(e=>{if(e.type==="checkbox"){if(e.dataset.multi){(o[e.name]=o[e.name]||[]);if(e.checked)o[e.name].push(e.value)}else o[e.name]=e.checked}else o[e.name]=e.value.trim()});return o}
+function cliente(id){return D.cliente.find(c=>c.id===id)}
+function tallerName(t){return (t.talleres||[]).map(c=>TNAME[c]).join(" + ")||"Taller"}
+function phoneIntl(p){let d=String(p||"").replace(/\D/g,"");if(!d)return"";if(d.length===9)d="34"+d;return d}
+function openDr(t,html){$("#dr-t").innerHTML=t;$("#dr-b").innerHTML=html;$("#dr").classList.add("open");$("#ov").classList.add("open");$("#dr-b").scrollTop=0}
+function closeDr(){$("#dr").classList.remove("open");$("#ov").classList.remove("open")}
+function toggleSide(){$("#side").classList.toggle("open")}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDr()});
+
+/* ---------------- cálculos ---------------- */
+function calc(t){
+  const personas=num(t.personas);const base=personas*num(t.precioPersona);
+  const lineas=[{concepto:`Taller de ${tallerName(t)} (${personas} personas × ${eur(t.precioPersona)})`,cant:personas,precio:num(t.precioPersona),importe:base}];
+  (t.extras||[]).forEach(x=>{if(!x.nombre)return;const cant=x.modo==="persona"?personas:num(x.cant||1);const imp=cant*num(x.precio);lineas.push({concepto:x.nombre+(x.modo==="persona"?` (${cant} × ${eur(x.precio)})`:""),cant,precio:num(x.precio),importe:imp})});
+  const bruto=lineas.reduce((a,l)=>a+l.importe,0);const dto=num(t.descuento);const base_imp=Math.max(0,bruto-dto);
+  const ivaP=t.iva===""||t.iva==null?num(AJ.iva):num(t.iva);const iva=base_imp*ivaP/100;const total=base_imp+iva;
+  const cobrado=(t.pagos||[]).reduce((a,p)=>a+num(p.importe),0);
+  const coste=personas*(t.talleres||[]).reduce((a,c)=>a+num(AJ.tarifas[c]?.coste),0);
+  const gastos=D.gasto.filter(g=>g.tallerId===t.id).reduce((a,g)=>a+num(g.importe),0);
+  return {lineas,bruto,dto,base:base_imp,ivaP,iva,total,cobrado,pendiente:Math.max(0,total-cobrado),coste,gastos,margen:base_imp-coste-gastos};
+}
+function payTag(t){if(t.estado==="perdido"||t.estado==="lead")return"";const c=calc(t);if(c.total<=0)return"";if(c.pendiente<=0.009)return`<span class="tag t-ok">Cobrado</span>`;if(c.cobrado>0)return`<span class="tag t-pend">Pendiente ${eur(c.pendiente)}</span>`;return t.estado==="realizado"?`<span class="tag t-pend">Sin cobrar</span>`:""}
+function stTag(e){return `<span class="tag t-${e}">${ENAME[e]||e}</span>`}
+
+/* ---------------- navegación ---------------- */
+const NAV=[["resumen","Resumen","◎"],["talleres","Talleres","⚗"],["calendario","Calendario","▦"],["clientes","Clientes","☺"],["tareas","Seguimientos","✓"],["documentos","Presupuestos y facturas","▤"],["finanzas","Finanzas","€"],["materiales","Materiales","⬡"],["proveedores","Proveedores","⇄"],["plantillas","Mensajes","✉"],["ajustes","Ajustes","⚙"]];
+let ROUTE="resumen";
+function go(r){if(!NAV.find(n=>n[0]===r))r="resumen";ROUTE=r;history.replaceState(null,"","#"+r);renderNav();$("#side").classList.remove("open");render();window.scrollTo(0,0)}
+function renderNav(){
+  const cnt={tareas:pendTareas().length,materiales:D.material.filter(m=>num(m.stock)<=num(m.minimo)&&m.minimo!=="").length,talleres:D.taller.filter(t=>t.estado==="lead").length};
+  $("#nav").innerHTML=NAV.map(([id,l,i])=>`<button class="${ROUTE===id?"on":""}" onclick="go('${id}')"><span style="width:18px;text-align:center">${i}</span>${l}${cnt[id]?`<span class="ct">${cnt[id]}</span>`:""}</button>`).join("");
+}
+function render(){const f={resumen:vResumen,talleres:vTalleres,calendario:vCal,clientes:vClientes,tareas:vTareas,documentos:vDocs,finanzas:vFin,materiales:vMat,proveedores:vProv,plantillas:vPlant,ajustes:vAj}[ROUTE];$("#main").innerHTML=(DEMO?`<div class="demo"><b>Modo prueba.</b> Los datos se guardan solo en este navegador. Cuando conectemos la base de datos, los tres veréis lo mismo desde cualquier dispositivo.</div>`:"")+f()}
+function ph(t,p,acts){return `<div class="ph"><div><h1>${t}</h1>${p?`<p>${p}</p>`:""}</div><div class="row">${acts||""}</div></div>`}
+
+/* ---------------- RESUMEN ---------------- */
+function pendTareas(){return D.tarea.filter(t=>!t.hecho&&t.fecha&&daysTo(t.fecha)<=0)}
+function vResumen(){
+  const hoy=today();const ym=hoy.slice(0,7);
+  const prox=D.taller.filter(t=>["confirmado","presupuesto"].includes(t.estado)&&t.fecha>=hoy).sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora));
+  const leads=D.taller.filter(t=>t.estado==="lead");
+  const segu=D.taller.filter(t=>t.estado==="presupuesto"&&daysTo(t.presuFecha||t._upd?.slice(0,10))<=-3);
+  const mes=D.taller.filter(t=>t.fecha?.startsWith(ym)&&["confirmado","realizado"].includes(t.estado));
+  const fact=mes.reduce((a,t)=>a+calc(t).base,0);
+  const gastosMes=D.gasto.filter(g=>g.fecha?.startsWith(ym)).reduce((a,g)=>a+num(g.importe),0);
+  const pend=D.taller.filter(t=>t.estado==="realizado"&&calc(t).pendiente>0.009);
+  const pendTot=pend.reduce((a,t)=>a+calc(t).pendiente,0);
+  const stock=D.material.filter(m=>m.minimo!==""&&num(m.stock)<=num(m.minimo));
+  const tareas=pendTareas();
+  const meta=num(AJ.meta);
+  return ph(`Hola${USER&&USER!=="modo prueba"?", "+esc(nameOf(USER)):""}`,new Date().toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}),`<button class="btn" onclick="newTaller()">+ Nuevo taller</button><button class="btn o" onclick="newCliente()">+ Cliente</button>`)+
+  `<div class="grid g4">
+    <div class="card kpi"><span class="lb">Facturación del mes</span><div class="v">${eur(fact)}</div>${meta?`<div class="bar" style="margin:6px 0"><i style="width:${Math.min(100,fact/meta*100)}%"></i></div><div class="s">Meta ${eur(meta)}</div>`:`<div class="s">Talleres confirmados o hechos, sin IVA</div>`}</div>
+    <div class="card kpi"><span class="lb">Beneficio del mes</span><div class="v">${eur(fact-gastosMes-mes.reduce((a,t)=>a+calc(t).coste,0))}</div><div class="s">Facturación − gastos − coste de materiales</div></div>
+    <div class="card kpi"><span class="lb">Por cobrar</span><div class="v">${eur(pendTot)}</div><div class="s">${pend.length} taller${pend.length===1?"":"es"} hecho${pend.length===1?"":"s"}</div></div>
+    <div class="card kpi"><span class="lb">Contactos nuevos</span><div class="v">${leads.length}</div><div class="s">Sin presupuesto todavía</div></div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><h2>Próximos talleres</h2><div class="list">${prox.slice(0,8).map(tRow).join("")||`<p class="empty">No hay talleres próximos.</p>`}</div></div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><h2>Para hoy</h2><div class="list">
+        ${tareas.map(x=>`<div class="it" onclick="editTarea('${x.id}')"><input type="checkbox" onclick="event.stopPropagation();doneTarea('${x.id}')"><div class="m"><b>${esc(x.titulo)}</b><span>${x.fecha<hoy?"Atrasada · ":""}${fd(x.fecha)}${x.persona?" · "+esc(x.persona):""}</span></div></div>`).join("")}
+        ${leads.map(t=>`<div class="it" onclick="openTaller('${t.id}')"><span class="tag t-lead">Responder</span><div class="m"><b>${esc(cliente(t.clienteId)?.nombre||"Sin nombre")}</b><span>${esc(t.ocasion||"")} · ${t.personas||"?"} personas</span></div></div>`).join("")}
+        ${segu.map(t=>`<div class="it" onclick="openTaller('${t.id}')"><span class="tag t-presupuesto">Seguimiento</span><div class="m"><b>${esc(cliente(t.clienteId)?.nombre||"")}</b><span>Presupuesto enviado hace días sin respuesta</span></div></div>`).join("")}
+        ${stock.map(m=>`<div class="it" onclick="go('materiales')"><span class="tag t-pend">Stock bajo</span><div class="m"><b>${esc(m.nombre)}</b><span>Quedan ${esc(m.stock)} ${esc(m.unidad||"")}</span></div></div>`).join("")}
+        ${!tareas.length&&!leads.length&&!segu.length&&!stock.length?`<p class="empty">Todo al día ✨</p>`:""}
+      </div></div>
+      ${pend.length?`<div class="card"><h2>Pendiente de cobro</h2><div class="list">${pend.map(tRow).join("")}</div></div>`:""}
+    </div>
+  </div>`;
+}
+function nameOf(email){const n=email.split("@")[0];return n.charAt(0).toUpperCase()+n.slice(1)}
+function tRow(t){const c=cliente(t.clienteId);const d=t.fecha?new Date(t.fecha+"T12:00:00"):null;
+  return `<div class="it" onclick="openTaller('${t.id}')"><div class="date">${d?`<b>${d.getDate()}</b><span>${d.toLocaleDateString("es-ES",{month:"short"})}</span>`:"<b>?</b>"}</div><div class="m"><b>${esc(c?.nombre||"Sin cliente")} · ${esc(tallerName(t))}</b><span>${t.hora?esc(t.hora)+" · ":""}${t.personas||"?"} pers. · ${esc(t.lugar||"Lugar por definir")}${(t.equipo||[]).length?" · "+t.equipo.join(", "):""}</span></div>${stTag(t.estado)}</div>`}
+
+/* ---------------- TALLERES ---------------- */
+let TF={estado:"activos",q:""};
+function vTalleres(){
+  let l=[...D.taller];
+  if(TF.estado==="activos")l=l.filter(t=>!["realizado","perdido"].includes(t.estado));else if(TF.estado!=="todos")l=l.filter(t=>t.estado===TF.estado);
+  if(TF.q){const q=TF.q.toLowerCase();l=l.filter(t=>(cliente(t.clienteId)?.nombre+" "+t.ocasion+" "+t.lugar+" "+tallerName(t)).toLowerCase().includes(q))}
+  l.sort((a,b)=>(TF.estado==="realizado"?-1:1)*String(a.fecha||"9").localeCompare(String(b.fecha||"9")));
+  return ph("Talleres","Cada solicitud, presupuesto y taller confirmado.",`<button class="btn" onclick="newTaller()">+ Nuevo taller</button>`)+
+  `<div class="filters"><div class="chips">${[["activos","En curso"],...ESTADOS,["todos","Todos"]].map(([v,n])=>`<button class="chip ${TF.estado===v?"on":""}" onclick="TF.estado='${v}';render()">${n} <small>${v==="activos"?D.taller.filter(t=>!["realizado","perdido"].includes(t.estado)).length:v==="todos"?D.taller.length:D.taller.filter(t=>t.estado===v).length}</small></button>`).join("")}</div>
+  <input placeholder="Buscar…" value="${esc(TF.q)}" oninput="TF.q=this.value;clearTimeout(window._q);window._q=setTimeout(()=>{render();const i=document.querySelector('.filters input');i.focus();i.setSelectionRange(i.value.length,i.value.length)},250)"></div>
+  <div class="card tw"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Taller</th><th class="hide-m">Pers.</th><th>Estado</th><th class="num">Total</th><th class="hide-m">Cobro</th></tr></thead><tbody>
+  ${l.map(t=>{const c=calc(t);return `<tr class="cl" onclick="openTaller('${t.id}')"><td>${t.fecha?fd(t.fecha,{day:"numeric",month:"short"}):"—"}${t.hora?`<br><small>${esc(t.hora)}</small>`:""}</td><td><b>${esc(cliente(t.clienteId)?.nombre||"—")}</b><br><small>${esc(t.ocasion||"")}</small></td><td>${esc(tallerName(t))}</td><td class="hide-m">${t.personas||""}</td><td>${stTag(t.estado)}</td><td class="num">${eur(c.total)}</td><td class="hide-m">${payTag(t)}</td></tr>`}).join("")||`<tr><td colspan="7" class="empty">No hay talleres aquí.</td></tr>`}
+  </tbody></table></div>`;
+}
+function newTaller(clienteId){editTaller(null,clienteId)}
+function editTaller(id,clienteId){
+  const t=id?structuredClone(D.taller.find(x=>x.id===id)):{estado:"lead",tarifa:"particular",clienteId:clienteId||"",talleres:["Pf"],personas:"",extras:[],pagos:[],equipo:[],iva:"",origen:""};
+  if(!id&&clienteId){const c=cliente(clienteId);if(c)t.tarifa=c.tipo==="particular"?"particular":"empresa"}
+  if(!t.precioPersona)t.precioPersona=suggestPrice(t);
+  window._T=t;
+  openDr(id?"Editar taller":"Nuevo taller",`<form class="f" id="tf" onsubmit="saveTaller(event)">
+   <div class="two"><label class="fl">Cliente<select name="clienteId" required>${opts(D.cliente.map(c=>[c.id,c.nombre]).sort((a,b)=>a[1].localeCompare(b[1])),t.clienteId,"Elige cliente…")}</select></label>
+   <label class="fl">&nbsp;<button type="button" class="btn o" onclick="quickCliente()">+ Cliente nuevo</button></label></div>
+   <div class="two"><label class="fl">Ocasión<select name="ocasion">${opts(OCASIONES,t.ocasion,"—")}</select></label><label class="fl">Estado<select name="estado">${opts(ESTADOS,t.estado)}</select></label></div>
+   <div class="sec">Talleres</div>
+   <div class="tl">${TALLERES.map(([c,n,k])=>`<label class="${k==="c"?"c":""}"><input type="checkbox" name="talleres" data-multi="1" value="${c}" ${t.talleres?.includes(c)?"checked":""} onchange="repriceT()"><b>${c}</b>${n}</label>`).join("")}</div>
+   <div class="sec">Fecha y lugar</div>
+   <div class="three"><label class="fl">Fecha<input type="date" name="fecha" value="${esc(t.fecha)}"></label><label class="fl">Hora<input type="time" name="hora" value="${esc(t.hora)}"></label><label class="fl">Duración (h)<input name="duracion" inputmode="decimal" value="${esc(t.duracion??"2,5")}"></label></div>
+   <div class="two"><label class="fl">Lugar<input name="lugar" value="${esc(t.lugar)}" placeholder="Oficina, restaurante, casa…"></label><label class="fl">Dirección<input name="direccion" value="${esc(t.direccion)}"></label></div>
+   <div class="sec">Grupo y equipo</div>
+   <div class="three"><label class="fl">Personas<input name="personas" inputmode="numeric" value="${esc(t.personas)}" oninput="updTot()"></label><label class="fl">Origen<select name="origen">${opts(ORIGENES,t.origen,"—")}</select></label><label class="fl">Tarifa<select name="tarifa" onchange="repriceT(true)">${opts([["particular","Particular"],["empresa","Empresa"]],t.tarifa)}</select></label></div>
+   <div class="row">${AJ.equipo.map(p=>`<label class="ck"><input type="checkbox" name="equipo" data-multi="1" value="${esc(p)}" ${t.equipo?.includes(p)?"checked":""}> ${esc(p)}</label>`).join("")}</div>
+   <label class="fl">Alergias o pieles sensibles<input name="alergias" value="${esc(t.alergias)}"></label>
+   <div class="sec">Precio (fórmula: base + extras)</div>
+   <div class="three"><label class="fl">Precio por persona (€)<input name="precioPersona" id="t-pp" inputmode="decimal" value="${esc(t.precioPersona)}" oninput="updTot()"></label><label class="fl">Descuento (€)<input name="descuento" inputmode="decimal" value="${esc(t.descuento)}" oninput="updTot()"></label><label class="fl">IVA (%)<input name="iva" inputmode="decimal" value="${esc(t.iva)}" placeholder="${AJ.iva}" oninput="updTot()"></label></div>
+   <div class="lines" id="t-ex"></div>
+   <div class="row"><select class="in" id="t-addex" style="max-width:280px"><option value="">+ Añadir extra…</option>${AJ.extras.map((x,i)=>`<option value="${i}">${esc(x.nombre)}</option>`).join("")}<option value="otro">Otro extra…</option></select></div>
+   <div class="tot" id="t-tot"></div>
+   <label class="fl">Notas<textarea name="notas">${esc(t.notas)}</textarea></label>
+   <div class="row" style="justify-content:space-between"><button class="btn" type="submit">Guardar</button>${id?`<button type="button" class="btn r o" style="color:var(--red);border-color:var(--red)" onclick="delTaller('${id}')">Eliminar</button>`:""}</div>
+  </form>`);
+  $("#t-addex").onchange=e=>{const v=e.target.value;if(v==="")return;const x=v==="otro"?{nombre:"",modo:"fijo",precio:0,cant:1}:{...AJ.extras[v],cant:1};window._T.extras.push(x);e.target.value="";drawEx()};
+  drawEx();
+}
+function suggestPrice(t){return (t.talleres||[]).reduce((a,c)=>a+num(AJ.tarifas[c]?.[t.tarifa||"particular"]),0)||""}
+function repriceT(force){const f=readForm($("#tf"));const t={...window._T,...f};const p=suggestPrice(t);const pp=$("#t-pp");if(force||!pp.value||pp.dataset.auto!=="0"){pp.value=p;}updTot()}
+document.addEventListener("input",e=>{if(e.target.id==="t-pp")e.target.dataset.auto="0"});
+function drawEx(){
+  const x=window._T.extras;
+  $("#t-ex").innerHTML=x.length?`<div class="ln lb" style="margin-bottom:2px"><span>Extra</span><span>Cómo se cobra</span><span>Cant.</span><span>Precio €</span><span></span></div>`+x.map((e,i)=>`<div class="ln"><input value="${esc(e.nombre)}" placeholder="Nombre del extra" oninput="window._T.extras[${i}].nombre=this.value"><select onchange="window._T.extras[${i}].modo=this.value;drawEx()">${opts([["persona","Por persona"],["fijo","Precio fijo"]],e.modo)}</select><input ${e.modo==="persona"?"disabled placeholder='×pers'":""} value="${e.modo==="persona"?"":esc(e.cant??1)}" inputmode="decimal" oninput="window._T.extras[${i}].cant=this.value;updTot()"><input value="${esc(e.precio)}" inputmode="decimal" oninput="window._T.extras[${i}].precio=this.value;updTot()"><button type="button" class="del" onclick="window._T.extras.splice(${i},1);drawEx()">×</button></div>`).join(""):"";
+  updTot();
+}
+function updTot(){const f=readForm($("#tf"));const t={...window._T,...f,extras:window._T.extras};const c=calc(t);
+  $("#t-tot").innerHTML=`<span>Subtotal ${eur(c.bruto)}</span>${c.dto?`<span>Descuento −${eur(c.dto)}</span>`:""}<span>Base ${eur(c.base)} · IVA ${c.ivaP}% ${eur(c.iva)}</span><b>Total ${eur(c.total)}</b><span class="lb">Coste materiales aprox. ${eur(c.coste)} · ${c.base?Math.round((c.base-c.coste)/c.base*100):0}% margen</span>`}
+async function saveTaller(e){e.preventDefault();const f=readForm($("#tf"));const t={...window._T,...f,extras:window._T.extras.filter(x=>x.nombre)};
+  if(t.estado==="presupuesto"&&!t.presuFecha)t.presuFecha=today();
+  await save("taller",t);closeDr();toast("Taller guardado");renderNav();render();openTaller(t.id)}
+async function delTaller(id){if(!confirm("¿Eliminar este taller?"))return;await del("taller",id);closeDr();toast("Eliminado");renderNav();render()}
+function quickCliente(){const n=prompt("Nombre del cliente (empresa o persona):");if(!n)return;const tipo=confirm("¿Es una empresa? (Aceptar = empresa, Cancelar = particular)")?"empresa":"particular";
+  save("cliente",{nombre:n,tipo,fecha:today()}).then(c=>{const sel=$("#tf select[name=clienteId]");sel.insertAdjacentHTML("beforeend",`<option value="${c.id}" selected>${esc(n)}</option>`);sel.value=c.id;$("#tf select[name=tarifa]").value=tipo==="particular"?"particular":"empresa";repriceT(true)})}
+
+function openTaller(id){
+  const t=D.taller.find(x=>x.id===id);if(!t)return;const c=cliente(t.clienteId)||{};const k=calc(t);
+  const docs=D.doc.filter(d=>d.tallerId===id).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const chk=[["chkMaterial","Material preparado"],["chkConfirmacion","Confirmación enviada"],["chkRecordatorio","Recordatorio día antes"],["chkResena","Reseña pedida"],["chkFotos","Fotos para redes"]];
+  openDr(`${esc(c.nombre||"Taller")}`,`
+   <div class="row" style="margin-bottom:14px">${stTag(t.estado)} ${payTag(t)} <span class="tag">${esc(t.ocasion||"")}</span></div>
+   <div class="grid g2">
+    <div class="card"><span class="lb">Taller</span><h2 style="margin:4px 0">${esc(tallerName(t))}</h2>
+      <div>${t.fecha?fd(t.fecha,{weekday:"long",day:"numeric",month:"long",year:"numeric"}):"Fecha por definir"}${t.hora?" · "+esc(t.hora):""}${t.duracion?" · "+esc(t.duracion)+" h":""}</div>
+      <div>${esc(t.lugar||"")}${t.direccion?`<br><a target="_blank" rel="noopener" href="https://maps.google.com/?q=${encodeURIComponent(t.direccion)}">${esc(t.direccion)}</a>`:""}</div>
+      <div style="margin-top:6px">${t.personas||"?"} personas${(t.equipo||[]).length?" · Equipo: "+t.equipo.join(", "):""}</div>
+      ${t.alergias?`<div style="margin-top:6px;color:var(--red)"><b>Alergias:</b> ${esc(t.alergias)}</div>`:""}
+      ${t.notas?`<div style="margin-top:6px;color:var(--muted);white-space:pre-wrap">${esc(t.notas)}</div>`:""}
+    </div>
+    <div class="card"><span class="lb">Cliente</span><h2 style="margin:4px 0;cursor:pointer" onclick="openCliente('${c.id}')">${esc(c.nombre||"—")}</h2>
+      ${c.contacto?`<div>${esc(c.contacto)}</div>`:""}${c.telefono?`<div>${esc(c.telefono)}</div>`:""}${c.email?`<div>${esc(c.email)}</div>`:""}
+      <div class="row" style="margin-top:10px">${c.telefono?`<button class="btn s g" onclick="msgPick('${id}','wa')">WhatsApp</button>`:""}${c.email?`<button class="btn s o" onclick="msgPick('${id}','mail')">Email</button>`:""}${c.telefono?`<a class="btn s o" href="tel:${esc(c.telefono)}">Llamar</a>`:""}</div>
+    </div>
+   </div>
+   <div class="card" style="margin-top:14px"><span class="lb">Importe</span>
+    <table>${k.lineas.map(l=>`<tr><td>${esc(l.concepto)}</td><td class="num">${eur(l.importe)}</td></tr>`).join("")}${k.dto?`<tr><td>Descuento</td><td class="num">−${eur(k.dto)}</td></tr>`:""}<tr><td>IVA ${k.ivaP}%</td><td class="num">${eur(k.iva)}</td></tr><tr><td><b>Total</b></td><td class="num"><b>${eur(k.total)}</b></td></tr></table>
+    <div class="lb" style="margin-top:8px">Coste materiales aprox. ${eur(k.coste)}${k.gastos?` · Gastos del taller ${eur(k.gastos)}`:""} · Margen ${eur(k.margen)}</div>
+   </div>
+   <div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><span class="lb">Cobros</span><span>Cobrado <b>${eur(k.cobrado)}</b> · Pendiente <b>${eur(k.pendiente)}</b></span></div>
+    <div class="list" style="margin-top:8px">${(t.pagos||[]).map((p,i)=>`<div class="it" style="cursor:default"><div class="m"><b>${eur(p.importe)} · ${esc(p.concepto||"Pago")}</b><span>${fd(p.fecha)} · ${esc(p.metodo||"")}</span></div><button class="del" onclick="delPago('${id}',${i})">×</button></div>`).join("")}</div>
+    <form class="row" style="margin-top:10px" onsubmit="addPago(event,'${id}')"><input class="in" style="width:110px" name="importe" placeholder="Importe €" inputmode="decimal" required value="${k.pendiente?k.pendiente.toFixed(2):""}"><select class="in" style="width:140px" name="concepto">${opts(["Señal","Pago final","Pago completo"])}</select><select class="in" style="width:140px" name="metodo">${opts(METODOS)}</select><input class="in" style="width:150px" type="date" name="fecha" value="${today()}"><button class="btn s">Añadir cobro</button></form>
+   </div>
+   <div class="card" style="margin-top:14px"><span class="lb">Checklist</span><div class="grid g2" style="margin-top:8px;gap:6px">${chk.map(([kk,l])=>`<label class="ck"><input type="checkbox" ${t[kk]?"checked":""} onchange="toggleChk('${id}','${kk}',this.checked)"> ${l}</label>`).join("")}</div></div>
+   <div class="card" style="margin-top:14px"><span class="lb">Documentos</span>
+    <div class="list" style="margin:8px 0">${docs.map(d=>`<div class="it" onclick="printDoc('${d.id}')"><span class="tag ${d.tipo==="factura"?"t-confirmado":"t-presupuesto"}">${d.tipo==="factura"?"Factura":"Presupuesto"}</span><div class="m"><b>${esc(d.numero)}</b><span>${fd(d.fecha)} · ${eur(d.total)}</span></div></div>`).join("")||`<p class="empty">Aún no hay documentos.</p>`}</div>
+    <div class="row"><button class="btn s a" onclick="makeDoc('${id}','presupuesto')">Crear presupuesto</button><button class="btn s" onclick="makeDoc('${id}','factura')">Crear factura</button></div>
+   </div>
+   <div class="row" style="margin-top:16px"><button class="btn" onclick="editTaller('${id}')">Editar</button><button class="btn o" onclick="addTareaFor('${id}')">+ Seguimiento</button><button class="btn o" onclick="addGastoFor('${id}')">+ Gasto</button><button class="btn o" onclick="dupTaller('${id}')">Duplicar</button>
+   ${t.estado!=="realizado"?`<select class="in" style="width:auto" onchange="setEstado('${id}',this.value)">${opts(ESTADOS,t.estado)}</select>`:""}</div>`);
+}
+async function setEstado(id,e){const t=D.taller.find(x=>x.id===id);t.estado=e;if(e==="presupuesto"&&!t.presuFecha)t.presuFecha=today();await save("taller",t);toast("Estado: "+ENAME[e]);renderNav();render();openTaller(id)}
+async function toggleChk(id,k,v){const t=D.taller.find(x=>x.id===id);t[k]=v;await save("taller",t)}
+async function addPago(e,id){e.preventDefault();const f=readForm(e.target);const t=D.taller.find(x=>x.id===id);(t.pagos=t.pagos||[]).push(f);await save("taller",t);toast("Cobro añadido");render();openTaller(id)}
+async function delPago(id,i){if(!confirm("¿Borrar este cobro?"))return;const t=D.taller.find(x=>x.id===id);t.pagos.splice(i,1);await save("taller",t);render();openTaller(id)}
+async function dupTaller(id){const t=structuredClone(D.taller.find(x=>x.id===id));delete t.id;t.estado="lead";t.fecha="";t.pagos=[];["chkMaterial","chkConfirmacion","chkRecordatorio","chkResena","chkFotos","presuFecha"].forEach(k=>delete t[k]);await save("taller",t);toast("Duplicado");editTaller(t.id)}
+
+/* ---------------- MENSAJES ---------------- */
+function fillTpl(txt,t){const c=cliente(t.clienteId)||{};const k=calc(t);const first=(c.contacto||c.nombre||"").split(" ")[0];
+  return txt.replace(/\{nombre\}/g,first).replace(/\{taller\}/g,tallerName(t).toLowerCase()).replace(/\{fecha\}/g,t.fecha?fd(t.fecha,{weekday:"long",day:"numeric",month:"long"}):"día por confirmar").replace(/\{hora\}/g,t.hora||"").replace(/\{lugar\}/g,t.lugar||"").replace(/\{personas\}/g,t.personas||"").replace(/\{total\}/g,eur(k.total))}
+function msgPick(id,how){const t=D.taller.find(x=>x.id===id);
+  openDr("Enviar mensaje",`<p class="empty">Elige una plantilla, revisa el texto y envía.</p><div class="list">${AJ.plantillas.map((p,i)=>`<div class="it" onclick="msgEdit('${id}','${how}',${i})"><div class="m"><b>${esc(p.nombre)}</b><span>${esc(fillTpl(p.texto,t)).slice(0,110)}…</span></div></div>`).join("")}<div class="it" onclick="msgEdit('${id}','${how}',-1)"><div class="m"><b>Mensaje libre</b></div></div></div><p><button class="btn o s" onclick="openTaller('${id}')">← Volver</button></p>`)}
+function msgEdit(id,how,i){const t=D.taller.find(x=>x.id===id);const txt=i>=0?fillTpl(AJ.plantillas[i].texto,t):"";
+  openDr("Enviar mensaje",`<div class="f"><textarea id="m-txt" style="min-height:200px">${esc(txt)}</textarea><div class="row"><button class="btn ${how==="wa"?"g":""}" onclick="msgSend('${id}','${how}')">${how==="wa"?"Abrir WhatsApp":"Abrir email"}</button><button class="btn o" onclick="navigator.clipboard.writeText(val('m-txt'));toast('Copiado')">Copiar</button><button class="btn o" onclick="msgPick('${id}','${how}')">← Plantillas</button></div></div>`)}
+function msgSend(id,how){const t=D.taller.find(x=>x.id===id);const c=cliente(t.clienteId)||{};const txt=$("#m-txt").value;
+  if(how==="wa")window.open(`https://wa.me/${phoneIntl(c.telefono)}?text=${encodeURIComponent(txt)}`,"_blank");else location.href=`mailto:${c.email}?subject=${encodeURIComponent("Lannex Lab · Taller de "+tallerName(t).toLowerCase())}&body=${encodeURIComponent(txt)}`;
+  if(!c.historial)c.historial=[];c.historial.unshift({fecha:today(),texto:(how==="wa"?"WhatsApp: ":"Email: ")+txt.slice(0,140)});save("cliente",c)}
+
+/* ---------------- DOCUMENTOS ---------------- */
+function nextNum(tipo){const y=today().slice(0,4);const p=(tipo==="factura"?"F":"P")+"-"+y+"-";const n=D.doc.filter(d=>d.tipo===tipo&&d.numero?.startsWith(p)).map(d=>parseInt(d.numero.slice(p.length))||0);return p+String((n.length?Math.max(...n):0)+1).padStart(3,"0")}
+async function makeDoc(id,tipo){const t=D.taller.find(x=>x.id===id);const c=cliente(t.clienteId)||{};const k=calc(t);
+  if(!t.clienteId){toast("El taller no tiene cliente");return}
+  if(tipo==="factura"&&(!c.nif&&c.tipo!=="particular")&&!confirm("Este cliente no tiene NIF/CIF. ¿Crear la factura igualmente?"))return;
+  const d={tipo,numero:nextNum(tipo),fecha:today(),tallerId:id,clienteId:t.clienteId,cliente:{nombre:c.razon||c.nombre,nif:c.nif||"",direccion:c.direccion||"",email:c.email||"",telefono:c.telefono||""},
+    detalle:`${tallerName(t)}${t.fecha?" · "+fd(t.fecha,{day:"numeric",month:"long",year:"numeric"}):""}${t.lugar?" · "+t.lugar:""}`,lineas:k.lineas,descuento:k.dto,base:k.base,ivaP:k.ivaP,iva:k.iva,total:k.total,nota:tipo==="factura"?AJ.notaFactura:AJ.notaPresupuesto,emisor:structuredClone(AJ.empresa),validez:AJ.validez};
+  await save("doc",d);
+  if(tipo==="presupuesto"&&["lead"].includes(t.estado)){t.estado="presupuesto";t.presuFecha=today();await save("taller",t)}
+  toast((tipo==="factura"?"Factura ":"Presupuesto ")+d.numero+" creado");renderNav();render();printDoc(d.id)}
+function docHTML(d){const e=d.emisor||AJ.empresa;
+  return `<div class="doc"><div class="dh2"><div><span class="logo" style="width:46px;height:46px;font-size:1.5rem"><small>3</small>Lx</span><div style="margin-top:8px;font-weight:700;letter-spacing:.12em">LANNEX LAB</div><div style="font-size:9pt;color:#555">Talleres de perfumería y cosmética</div></div>
+   <div class="meta"><h1>${d.tipo==="factura"?"Factura":"Presupuesto"}</h1><div><b>Nº ${esc(d.numero)}</b></div><div>Fecha: ${fd(d.fecha,{day:"numeric",month:"long",year:"numeric"})}</div>${d.tipo==="presupuesto"?`<div>Válido ${esc(d.validez||15)} días</div>`:""}</div></div>
+   <div class="who"><div><div class="lb">Emisor</div><b>${esc(e.titular||e.nombre)}</b>${e.titular?`<div>${esc(e.nombre)}</div>`:""}${e.nif?`<div>NIF: ${esc(e.nif)}</div>`:""}${e.direccion?`<div>${esc(e.direccion)}</div>`:""}<div>${esc(e.email)} · ${esc(e.telefono)}</div></div>
+   <div><div class="lb">Cliente</div><b>${esc(d.cliente.nombre)}</b>${d.cliente.nif?`<div>NIF/CIF: ${esc(d.cliente.nif)}</div>`:""}${d.cliente.direccion?`<div>${esc(d.cliente.direccion)}</div>`:""}${d.cliente.email?`<div>${esc(d.cliente.email)}</div>`:""}</div></div>
+   <div style="margin-bottom:8px"><b>Concepto:</b> ${esc(d.detalle)}</div>
+   <table><thead><tr><th>Descripción</th><th class="num">Importe</th></tr></thead><tbody>${d.lineas.map(l=>`<tr><td>${esc(l.concepto)}</td><td class="num">${eur(l.importe)}</td></tr>`).join("")}</tbody></table>
+   <div class="tt">${d.descuento?`<div><span>Descuento</span><span>−${eur(d.descuento)}</span></div>`:""}<div><span>Base imponible</span><span>${eur(d.base)}</span></div><div><span>IVA ${d.ivaP}%</span><span>${eur(d.iva)}</span></div><div class="g"><span>Total</span><span>${eur(d.total)}</span></div></div>
+   ${d.tipo==="factura"&&e.iban?`<div class="nt"><b>Forma de pago:</b> transferencia a ${esc(e.iban)}</div>`:""}
+   <div class="nt">${esc(d.nota||"")}</div><div class="nt" style="margin-top:30px;text-align:center;color:#888">${esc(e.web)} · ${esc(e.email)} · ${esc(e.telefono)}</div></div>`}
+function printDoc(id){const d=D.doc.find(x=>x.id===id);if(!d)return;
+  openDr(`${d.tipo==="factura"?"Factura":"Presupuesto"} ${esc(d.numero)}`,`<div class="row" style="margin-bottom:14px"><button class="btn" onclick="doPrint('${id}')">Imprimir / guardar PDF</button>${d.tallerId?`<button class="btn o" onclick="openTaller('${d.tallerId}')">Ver taller</button>`:""}<button class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delDoc('${id}')">Eliminar</button></div><div class="card" style="background:#fff">${docHTML(d)}</div>`)}
+function doPrint(id){const d=D.doc.find(x=>x.id===id);$("#print").innerHTML=docHTML(d);const old=document.title;document.title=`${d.numero} ${d.cliente.nombre}`;document.body.classList.add("printing");setTimeout(()=>{window.print();document.body.classList.remove("printing");document.title=old},50)}
+async function delDoc(id){const d=D.doc.find(x=>x.id===id);if(d.tipo==="factura"&&!confirm("Ojo: borrar facturas puede dejar huecos en la numeración. ¿Seguro?"))return;if(d.tipo!=="factura"&&!confirm("¿Eliminar el presupuesto?"))return;await del("doc",id);closeDr();render()}
+let DF="todos";
+function vDocs(){const l=D.doc.filter(d=>DF==="todos"||d.tipo===DF).sort((a,b)=>(b.fecha+b.numero).localeCompare(a.fecha+a.numero));
+  return ph("Presupuestos y facturas","Se crean desde cada taller. Puedes imprimirlos o guardarlos en PDF.")+
+  `<div class="filters"><div class="chips">${[["todos","Todos"],["presupuesto","Presupuestos"],["factura","Facturas"]].map(([v,n])=>`<button class="chip ${DF===v?"on":""}" onclick="DF='${v}';render()">${n}</button>`).join("")}</div></div>
+  <div class="card tw"><table><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th class="num">Base</th><th class="num">Total</th></tr></thead><tbody>${l.map(d=>`<tr class="cl" onclick="printDoc('${d.id}')"><td><b>${esc(d.numero)}</b></td><td>${fd(d.fecha)}</td><td>${esc(d.cliente.nombre)}</td><td class="num">${eur(d.base)}</td><td class="num">${eur(d.total)}</td></tr>`).join("")||`<tr><td colspan="5" class="empty">Todavía no hay documentos. Ábrelos desde un taller.</td></tr>`}</tbody></table></div>`}
+
+/* ---------------- CALENDARIO ---------------- */
+let CM=today().slice(0,7);
+function vCal(){const [y,m]=CM.split("-").map(Number);const first=new Date(y,m-1,1);const start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+  const days=[];for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);days.push(d)}
+  const ds=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const col={lead:"var(--blue2)",presupuesto:"var(--amber2)",confirmado:"var(--sage2)",realizado:"#1B1A21",perdido:"var(--red2)"};
+  return ph(first.toLocaleDateString("es-ES",{month:"long",year:"numeric"}).replace(/^./,c=>c.toUpperCase()),"Talleres y seguimientos del mes.",`<button class="btn o" onclick="shiftM(-1)">←</button><button class="btn o" onclick="CM=today().slice(0,7);render()">Hoy</button><button class="btn o" onclick="shiftM(1)">→</button>`)+
+  `<div class="cal">${["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map(d=>`<div class="dh">${d}</div>`).join("")}${days.map(d=>{const s=ds(d);
+   const ev=D.taller.filter(t=>t.fecha===s&&t.estado!=="perdido").map(t=>`<span class="ev" style="background:${col[t.estado]};${t.estado==="realizado"?"color:#fff":""}" onclick="openTaller('${t.id}')">${esc(t.hora||"")} ${esc(cliente(t.clienteId)?.nombre||"")}</span>`).join("")+D.tarea.filter(x=>x.fecha===s&&!x.hecho).map(x=>`<span class="ev" style="border:1px dashed var(--line)" onclick="editTarea('${x.id}')">✓ ${esc(x.titulo)}</span>`).join("");
+   return `<div class="d ${d.getMonth()!==m-1?"out":""} ${s===today()?"today":""}"><span class="n">${d.getDate()}</span>${ev}</div>`}).join("")}</div>`}
+function shiftM(n){const [y,m]=CM.split("-").map(Number);const d=new Date(y,m-1+n,1);CM=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");render()}
+
+/* ---------------- CLIENTES ---------------- */
+let CF={tipo:"todos",q:""};
+function vClientes(){let l=[...D.cliente];if(CF.tipo!=="todos")l=l.filter(c=>c.tipo===CF.tipo);if(CF.q){const q=CF.q.toLowerCase();l=l.filter(c=>[c.nombre,c.contacto,c.email,c.telefono].join(" ").toLowerCase().includes(q))}
+  l.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  return ph("Clientes",`${D.cliente.length} en total`,`<button class="btn" onclick="newCliente()">+ Nuevo cliente</button>`)+
+  `<div class="filters"><div class="chips">${[["todos","Todos"],...TIPOS].map(([v,n])=>`<button class="chip ${CF.tipo===v?"on":""}" onclick="CF.tipo='${v}';render()">${n}</button>`).join("")}</div><input placeholder="Buscar…" value="${esc(CF.q)}" onchange="CF.q=this.value;render()"></div>
+  <div class="card tw"><table><thead><tr><th>Nombre</th><th>Tipo</th><th class="hide-m">Contacto</th><th class="hide-m">Teléfono</th><th class="num">Talleres</th><th class="num">Facturado</th></tr></thead><tbody>${l.map(c=>{const ts=D.taller.filter(t=>t.clienteId===c.id);const f=ts.filter(t=>t.estado==="realizado").reduce((a,t)=>a+calc(t).base,0);return `<tr class="cl" onclick="openCliente('${c.id}')"><td><b>${esc(c.nombre)}</b></td><td>${esc((TIPOS.find(x=>x[0]===c.tipo)||[,""])[1])}</td><td class="hide-m">${esc(c.contacto||"")}</td><td class="hide-m">${esc(c.telefono||"")}</td><td class="num">${ts.length}</td><td class="num">${eur(f)}</td></tr>`}).join("")||`<tr><td colspan="6" class="empty">Sin clientes.</td></tr>`}</tbody></table></div>`}
+function newCliente(){editCliente(null)}
+function editCliente(id){const c=id?D.cliente.find(x=>x.id===id):{tipo:"empresa",fecha:today()};
+  openDr(id?"Editar cliente":"Nuevo cliente",`<form class="f" id="cf" onsubmit="saveCliente(event,'${id||""}')">
+   <div class="two"><label class="fl">Nombre (empresa o persona)<input name="nombre" required value="${esc(c.nombre)}"></label><label class="fl">Tipo<select name="tipo">${opts(TIPOS,c.tipo)}</select></label></div>
+   <div class="three"><label class="fl">Persona de contacto<input name="contacto" value="${esc(c.contacto)}"></label><label class="fl">Teléfono<input name="telefono" type="tel" value="${esc(c.telefono)}"></label><label class="fl">Email<input name="email" type="email" value="${esc(c.email)}"></label></div>
+   <div class="two"><label class="fl">Cómo nos conoció<select name="origen">${opts(ORIGENES,c.origen,"—")}</select></label><label class="fl">Instagram / web<input name="web" value="${esc(c.web)}"></label></div>
+   <div class="sec">Datos de facturación</div>
+   <div class="two"><label class="fl">Razón social<input name="razon" value="${esc(c.razon)}"></label><label class="fl">NIF / CIF<input name="nif" value="${esc(c.nif)}"></label></div>
+   <label class="fl">Dirección fiscal<input name="direccion" value="${esc(c.direccion)}"></label>
+   <label class="fl">Notas<textarea name="notas">${esc(c.notas)}</textarea></label>
+   <div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${id?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delCliente('${id}')">Eliminar</button>`:""}</div></form>`)}
+async function saveCliente(e,id){e.preventDefault();const f=readForm($("#cf"));
+  if(!id){const dup=D.cliente.find(c=>(f.telefono&&phoneIntl(c.telefono)===phoneIntl(f.telefono))||(f.email&&c.email?.toLowerCase()===f.email.toLowerCase()));if(dup&&!confirm(`Ya existe "${dup.nombre}" con ese teléfono o email. ¿Crear igualmente?`))return}
+  const c=id?{...D.cliente.find(x=>x.id===id),...f}:{...f,fecha:today()};await save("cliente",c);toast("Cliente guardado");render();openCliente(c.id)}
+async function delCliente(id){if(D.taller.some(t=>t.clienteId===id)){toast("Tiene talleres: bórralos antes");return}if(!confirm("¿Eliminar cliente?"))return;await del("cliente",id);closeDr();render()}
+function openCliente(id){const c=cliente(id);if(!c)return;const ts=D.taller.filter(t=>t.clienteId===id).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
+  openDr(esc(c.nombre),`<div class="row" style="margin-bottom:12px"><span class="tag">${esc((TIPOS.find(x=>x[0]===c.tipo)||[,""])[1])}</span>${c.origen?`<span class="tag">${esc(c.origen)}</span>`:""}</div>
+   <div class="card">${c.contacto?`<div><b>${esc(c.contacto)}</b></div>`:""}${c.telefono?`<div>${esc(c.telefono)}</div>`:""}${c.email?`<div>${esc(c.email)}</div>`:""}${c.nif?`<div class="lb" style="margin-top:6px">${esc(c.razon||c.nombre)} · ${esc(c.nif)}</div>`:""}${c.direccion?`<div class="lb">${esc(c.direccion)}</div>`:""}${c.notas?`<p style="white-space:pre-wrap;color:var(--muted)">${esc(c.notas)}</p>`:""}
+    <div class="row" style="margin-top:10px">${c.telefono?`<a class="btn s g" target="_blank" rel="noopener" href="https://wa.me/${phoneIntl(c.telefono)}">WhatsApp</a><a class="btn s o" href="tel:${esc(c.telefono)}">Llamar</a>`:""}${c.email?`<a class="btn s o" href="mailto:${esc(c.email)}">Email</a>`:""}<button class="btn s o" onclick="editCliente('${id}')">Editar</button></div></div>
+   <div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><span class="lb">Talleres</span><button class="btn s" onclick="newTaller('${id}')">+ Taller</button></div><div class="list" style="margin-top:8px">${ts.map(tRow).join("")||`<p class="empty">Sin talleres.</p>`}</div></div>
+   <div class="card" style="margin-top:14px"><span class="lb">Historial</span><form class="row" style="margin:8px 0" onsubmit="addNota(event,'${id}')"><input class="in" name="t" placeholder="Apunta una llamada, un comentario…" style="flex:1" required><button class="btn s">Añadir</button></form>
+    <div class="list">${(c.historial||[]).map(h=>`<div class="it" style="cursor:default"><div class="m"><span>${fd(h.fecha)}${h.por?" · "+esc(h.por):""}</span><div style="white-space:pre-wrap">${esc(h.texto)}</div></div></div>`).join("")||`<p class="empty">Sin notas.</p>`}</div></div>`)}
+async function addNota(e,id){e.preventDefault();const c=cliente(id);(c.historial=c.historial||[]).unshift({fecha:today(),texto:e.target.t.value,por:nameOf(USER)});await save("cliente",c);openCliente(id)}
+
+/* ---------------- SEGUIMIENTOS ---------------- */
+function vTareas(){const p=D.tarea.filter(t=>!t.hecho).sort((a,b)=>String(a.fecha||"9").localeCompare(String(b.fecha||"9")));const h=D.tarea.filter(t=>t.hecho).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))).slice(0,20);
+  const row=x=>{const t=x.tallerId?D.taller.find(y=>y.id===x.tallerId):null;return `<div class="it" onclick="editTarea('${x.id}')"><input type="checkbox" ${x.hecho?"checked":""} onclick="event.stopPropagation();doneTarea('${x.id}')"><div class="m"><b style="${x.hecho?"text-decoration:line-through;color:var(--muted)":""}">${esc(x.titulo)}</b><span>${x.fecha?fd(x.fecha):"Sin fecha"}${!x.hecho&&x.fecha&&x.fecha<today()?' · <b style="color:var(--red)">atrasada</b>':""}${x.persona?" · "+esc(x.persona):""}${t?" · "+esc(cliente(t.clienteId)?.nombre||""):""}</span></div></div>`};
+  return ph("Seguimientos","Llamadas, recordatorios y cosas por hacer.",`<button class="btn" onclick="editTarea()">+ Nuevo</button>`)+`<div class="grid g2"><div class="card"><h2>Pendientes</h2><div class="list">${p.map(row).join("")||`<p class="empty">Nada pendiente.</p>`}</div></div><div class="card"><h2>Hechos</h2><div class="list">${h.map(row).join("")||`<p class="empty">—</p>`}</div></div></div>`}
+function addTareaFor(tid){editTarea(null,tid)}
+function editTarea(id,tid){const x=id?D.tarea.find(t=>t.id===id):{fecha:today(),tallerId:tid||""};
+  openDr(id?"Editar seguimiento":"Nuevo seguimiento",`<form class="f" id="xf" onsubmit="saveTarea(event,'${id||""}')"><label class="fl">Qué hay que hacer<input name="titulo" required value="${esc(x.titulo)}" placeholder="Llamar para confirmar personas…"></label>
+   <div class="three"><label class="fl">Fecha<input type="date" name="fecha" value="${esc(x.fecha)}"></label><label class="fl">Quién<select name="persona">${opts(AJ.equipo,x.persona,"—")}</select></label><label class="fl">Taller<select name="tallerId">${opts(D.taller.map(t=>[t.id,(cliente(t.clienteId)?.nombre||"")+" · "+(t.fecha?fd(t.fecha,{day:"numeric",month:"short"}):"sin fecha")]),x.tallerId,"—")}</select></label></div>
+   <label class="fl">Notas<textarea name="notas">${esc(x.notas)}</textarea></label><div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${id?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delTarea('${id}')">Eliminar</button>`:""}</div></form>`)}
+async function saveTarea(e,id){e.preventDefault();const f=readForm($("#xf"));const x=id?{...D.tarea.find(t=>t.id===id),...f}:f;await save("tarea",x);closeDr();toast("Guardado");renderNav();render()}
+async function doneTarea(id){const x=D.tarea.find(t=>t.id===id);x.hecho=!x.hecho;await save("tarea",x);renderNav();render()}
+async function delTarea(id){await del("tarea",id);closeDr();renderNav();render()}
+
+/* ---------------- FINANZAS ---------------- */
+let FP={tipo:"mes",v:today().slice(0,7)};
+function inPeriod(d){if(!d)return false;if(FP.tipo==="mes")return d.startsWith(FP.v);if(FP.tipo==="año")return d.startsWith(FP.v.slice(0,4));if(FP.tipo==="trim"){const [y,m]=FP.v.split("-").map(Number);const q=Math.floor((m-1)/3);const dm=Number(d.slice(5,7));return d.startsWith(y+"-")&&Math.floor((dm-1)/3)===q}return true}
+function vFin(){
+  const ts=D.taller.filter(t=>["confirmado","realizado"].includes(t.estado)&&inPeriod(t.fecha));
+  const ing=ts.reduce((a,t)=>a+calc(t).base,0);const ivaR=ts.reduce((a,t)=>a+calc(t).iva,0);const coste=ts.reduce((a,t)=>a+calc(t).coste,0);
+  const gs=D.gasto.filter(g=>inPeriod(g.fecha)).sort((a,b)=>b.fecha.localeCompare(a.fecha));const gas=gs.reduce((a,g)=>a+num(g.importe),0);
+  const cob=D.taller.flatMap(t=>(t.pagos||[]).map(p=>({...p,t}))).filter(p=>inPeriod(p.fecha));const cobT=cob.reduce((a,p)=>a+num(p.importe),0);
+  const porCat={};gs.forEach(g=>porCat[g.categoria||"Otros"]=(porCat[g.categoria||"Otros"]||0)+num(g.importe));
+  const adel={};D.gasto.filter(g=>g.pagadoPor&&g.pagadoPor!=="Empresa"&&!g.reembolsado).forEach(g=>adel[g.pagadoPor]=(adel[g.pagadoPor]||0)+num(g.importe));
+  const porTaller={};ts.forEach(t=>t.talleres?.forEach(c=>porTaller[c]=(porTaller[c]||0)+1));
+  const porOrigen={};D.taller.filter(t=>inPeriod(t.fecha)||inPeriod(t._upd?.slice(0,10))).forEach(t=>{const o=t.origen||cliente(t.clienteId)?.origen||"Sin indicar";porOrigen[o]=porOrigen[o]||{n:0,ok:0};porOrigen[o].n++;if(["confirmado","realizado"].includes(t.estado))porOrigen[o].ok++});
+  const sel=`<select class="in" style="width:auto" onchange="FP.tipo=this.value;render()">${opts([["mes","Mes"],["trim","Trimestre"],["año","Año"],["todo","Todo"]],FP.tipo)}</select>${FP.tipo!=="todo"?`<input class="in" style="width:auto" type="month" value="${FP.v}" onchange="FP.v=this.value;render()">`:""}`;
+  return ph("Finanzas","Ingresos sin IVA por fecha del taller (confirmados y realizados).",sel+`<button class="btn o" onclick="exportCSV()">Exportar CSV</button><button class="btn" onclick="editGasto()">+ Gasto</button>`)+
+  `<div class="grid g4"><div class="card kpi"><span class="lb">Ingresos</span><div class="v">${eur(ing)}</div><div class="s">${ts.length} talleres · IVA repercutido ${eur(ivaR)}</div></div>
+   <div class="card kpi"><span class="lb">Gastos</span><div class="v">${eur(gas)}</div><div class="s">${gs.length} apuntes</div></div>
+   <div class="card kpi"><span class="lb">Coste materiales estimado</span><div class="v">${eur(coste)}</div><div class="s">Según el coste por persona de Ajustes</div></div>
+   <div class="card kpi"><span class="lb">Resultado</span><div class="v" style="color:${ing-gas>=0?"var(--sage)":"var(--red)"}">${eur(ing-gas)}</div><div class="s">Ingresos − gastos · Cobrado en el periodo ${eur(cobT)}</div></div></div>
+  <div class="grid g3" style="margin-top:14px">
+   <div class="card"><h2>Gastos por categoría</h2>${Object.entries(porCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:8px 0"><div class="row" style="justify-content:space-between"><span>${esc(k)}</span><b>${eur(v)}</b></div><div class="bar"><i style="width:${gas?v/gas*100:0}%"></i></div></div>`).join("")||`<p class="empty">Sin gastos.</p>`}</div>
+   <div class="card"><h2>Talleres más vendidos</h2>${Object.entries(porTaller).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="justify-content:space-between;margin:6px 0"><span>${esc(TNAME[k])}</span><b>${v}</b></div>`).join("")||`<p class="empty">—</p>`}
+    <h2 style="margin-top:16px">De dónde vienen</h2>${Object.entries(porOrigen).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>`<div class="row" style="justify-content:space-between;margin:6px 0"><span>${esc(k)}</span><span>${v.n} contactos · <b>${v.ok} cerrados</b></span></div>`).join("")||`<p class="empty">—</p>`}</div>
+   <div class="card"><h2>Gastos adelantados</h2><p class="empty" style="margin-top:-4px">Lo que alguien ha pagado de su bolsillo y falta devolver.</p>${Object.entries(adel).map(([k,v])=>`<div class="row" style="justify-content:space-between;margin:6px 0"><span>${esc(k)}</span><b>${eur(v)}</b></div>`).join("")||`<p class="empty">Nada pendiente.</p>`}</div>
+  </div>
+  <div class="card tw" style="margin-top:14px"><h2>Gastos</h2><table><thead><tr><th>Fecha</th><th>Concepto</th><th class="hide-m">Categoría</th><th class="hide-m">Pagado por</th><th class="num">Importe</th></tr></thead><tbody>${gs.map(g=>`<tr class="cl" onclick="editGasto('${g.id}')"><td>${fd(g.fecha,{day:"numeric",month:"short"})}</td><td>${esc(g.concepto)}${g.tallerId?` <small class="lb">· taller</small>`:""}</td><td class="hide-m">${esc(g.categoria||"")}</td><td class="hide-m">${esc(g.pagadoPor||"")}${g.reembolsado?" ✓":""}</td><td class="num">${eur(g.importe)}</td></tr>`).join("")||`<tr><td colspan="5" class="empty">Sin gastos en este periodo.</td></tr>`}</tbody></table></div>`}
+function addGastoFor(tid){editGasto(null,tid)}
+function editGasto(id,tid){const g=id?D.gasto.find(x=>x.id===id):{fecha:today(),tallerId:tid||"",categoria:"Materiales",pagadoPor:"Empresa"};
+  openDr(id?"Editar gasto":"Nuevo gasto",`<form class="f" id="gf" onsubmit="saveGasto(event,'${id||""}')"><div class="two"><label class="fl">Concepto<input name="concepto" required value="${esc(g.concepto)}"></label><label class="fl">Importe (€, IVA incl.)<input name="importe" inputmode="decimal" required value="${esc(g.importe)}"></label></div>
+   <div class="three"><label class="fl">Fecha<input type="date" name="fecha" value="${esc(g.fecha)}"></label><label class="fl">Categoría<select name="categoria">${opts(CAT_GASTO,g.categoria)}</select></label><label class="fl">Pagado por<select name="pagadoPor">${opts(["Empresa",...AJ.equipo],g.pagadoPor)}</select></label></div>
+   <div class="two"><label class="fl">Proveedor<select name="proveedorId">${opts(D.proveedor.map(p=>[p.id,p.nombre]),g.proveedorId,"—")}</select></label><label class="fl">Taller (opcional)<select name="tallerId">${opts(D.taller.map(t=>[t.id,(cliente(t.clienteId)?.nombre||"")+" · "+(t.fecha?fd(t.fecha,{day:"numeric",month:"short"}):"")]),g.tallerId,"—")}</select></label></div>
+   <label class="ck"><input type="checkbox" name="reembolsado" ${g.reembolsado?"checked":""}> Ya se le ha devuelto a quien lo pagó</label>
+   <label class="fl">Notas<textarea name="notas">${esc(g.notas)}</textarea></label>
+   <div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${id?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delGasto('${id}')">Eliminar</button>`:""}</div></form>`)}
+async function saveGasto(e,id){e.preventDefault();const f=readForm($("#gf"));f.importe=String(num(f.importe));const g=id?{...D.gasto.find(x=>x.id===id),...f}:f;await save("gasto",g);closeDr();toast("Gasto guardado");render()}
+async function delGasto(id){if(!confirm("¿Eliminar gasto?"))return;await del("gasto",id);closeDr();render()}
+function exportCSV(){const rows=[["Tipo","Fecha","Concepto","Cliente/Proveedor","Base","IVA","Total"]];
+  D.taller.filter(t=>["confirmado","realizado"].includes(t.estado)&&inPeriod(t.fecha)).forEach(t=>{const c=calc(t);rows.push(["Ingreso",t.fecha,tallerName(t),cliente(t.clienteId)?.nombre||"",c.base.toFixed(2),c.iva.toFixed(2),c.total.toFixed(2)])});
+  D.gasto.filter(g=>inPeriod(g.fecha)).forEach(g=>rows.push(["Gasto",g.fecha,g.concepto,D.proveedor.find(p=>p.id===g.proveedorId)?.nombre||"","","",num(g.importe).toFixed(2)]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));a.download=`lannex-finanzas-${FP.tipo==="todo"?"todo":FP.v}.csv`;a.click()}
+
+/* ---------------- MATERIALES ---------------- */
+let MF="todos";
+function vMat(){let l=D.material.filter(m=>MF==="todos"||(MF==="bajo"?(m.minimo!==""&&num(m.stock)<=num(m.minimo)):m.categoria===MF)).sort((a,b)=>(a.categoria+a.nombre).localeCompare(b.categoria+b.nombre));
+  const valor=D.material.reduce((a,m)=>a+num(m.stock)*num(m.coste),0);
+  return ph("Materiales",`Inventario de bases, aceites, envases y etiquetas · Valor aprox. ${eur(valor)}`,`<button class="btn" onclick="editMat()">+ Material</button>`)+
+  `<div class="filters"><div class="chips">${[["todos","Todos"],["bajo","Stock bajo"],...CAT_MAT.map(c=>[c,c])].map(([v,n])=>`<button class="chip ${MF===v?"on":""}" onclick="MF='${esc(v)}';render()">${esc(n)}</button>`).join("")}</div></div>
+  <div class="card tw"><table><thead><tr><th>Material</th><th class="hide-m">Categoría</th><th class="hide-m">Proveedor</th><th class="num">Stock</th><th></th></tr></thead><tbody>${l.map(m=>{const low=m.minimo!==""&&num(m.stock)<=num(m.minimo);return `<tr><td class="cl" onclick="editMat('${m.id}')"><b>${esc(m.nombre)}</b>${m.coste?`<br><small>${eur(m.coste)} / ${esc(m.unidad||"ud")}</small>`:""}</td><td class="hide-m">${esc(m.categoria||"")}</td><td class="hide-m">${esc(D.proveedor.find(p=>p.id===m.proveedorId)?.nombre||"")}</td><td class="num"><b style="${low?"color:var(--red)":""}">${esc(m.stock||0)}</b> ${esc(m.unidad||"")}${m.minimo!==""&&m.minimo!=null?`<br><small>mín. ${esc(m.minimo)}</small>`:""}</td><td><div class="row" style="flex-wrap:nowrap"><button class="btn s o" onclick="stk('${m.id}',-1)">−</button><button class="btn s o" onclick="stk('${m.id}',1)">+</button></div></td></tr>`}).join("")||`<tr><td colspan="5" class="empty">Añade vuestros materiales para controlar el stock.</td></tr>`}</tbody></table></div>`}
+function editMat(id){const m=id?D.material.find(x=>x.id===id):{categoria:"Bases",unidad:"ud",stock:0,minimo:""};
+  openDr(id?"Editar material":"Nuevo material",`<form class="f" id="mf" onsubmit="saveMat(event,'${id||""}')"><div class="two"><label class="fl">Nombre<input name="nombre" required value="${esc(m.nombre)}" placeholder="Base de perfume 100 ml"></label><label class="fl">Categoría<select name="categoria">${opts(CAT_MAT,m.categoria)}</select></label></div>
+   <div class="three"><label class="fl">Stock<input name="stock" inputmode="decimal" value="${esc(m.stock)}"></label><label class="fl">Unidad<input name="unidad" value="${esc(m.unidad)}" placeholder="ud, ml, g"></label><label class="fl">Avisar si baja de<input name="minimo" inputmode="decimal" value="${esc(m.minimo)}"></label></div>
+   <div class="two"><label class="fl">Coste por unidad (€)<input name="coste" inputmode="decimal" value="${esc(m.coste)}"></label><label class="fl">Proveedor<select name="proveedorId">${opts(D.proveedor.map(p=>[p.id,p.nombre]),m.proveedorId,"—")}</select></label></div>
+   <label class="fl">Notas<textarea name="notas">${esc(m.notas)}</textarea></label><div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${id?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delMat('${id}')">Eliminar</button>`:""}</div></form>`)}
+async function saveMat(e,id){e.preventDefault();const f=readForm($("#mf"));const m=id?{...D.material.find(x=>x.id===id),...f}:f;await save("material",m);closeDr();toast("Guardado");renderNav();render()}
+async function stk(id,d){const m=D.material.find(x=>x.id===id);m.stock=String(Math.max(0,num(m.stock)+d));await save("material",m);renderNav();render()}
+async function delMat(id){if(!confirm("¿Eliminar?"))return;await del("material",id);closeDr();renderNav();render()}
+
+/* ---------------- PROVEEDORES ---------------- */
+function vProv(){const l=[...D.proveedor].sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  return ph("Proveedores","Dónde compráis bases, aceites, envases y packaging.",`<button class="btn" onclick="editProv()">+ Proveedor</button>`)+`<div class="grid g3">${l.map(p=>{const g=D.gasto.filter(x=>x.proveedorId===p.id).reduce((a,x)=>a+num(x.importe),0);return `<div class="card" style="cursor:pointer" onclick="editProv('${p.id}')"><span class="lb">${esc(p.categoria||"Proveedor")}</span><h2 style="margin:4px 0">${esc(p.nombre)}</h2>${p.contacto?`<div>${esc(p.contacto)}</div>`:""}${p.telefono?`<div>${esc(p.telefono)}</div>`:""}${p.email?`<div>${esc(p.email)}</div>`:""}${p.web?`<div><a href="${esc(p.web.startsWith("http")?p.web:"https://"+p.web)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(p.web)}</a></div>`:""}${p.notas?`<p style="color:var(--muted);font-size:.86rem;white-space:pre-wrap">${esc(p.notas)}</p>`:""}<div class="lb" style="margin-top:8px">Gastado: ${eur(g)}</div></div>`}).join("")||`<div class="card empty">Aún no hay proveedores.</div>`}</div>`}
+function editProv(id){const p=id?D.proveedor.find(x=>x.id===id):{};
+  openDr(id?"Editar proveedor":"Nuevo proveedor",`<form class="f" id="pf" onsubmit="saveProv(event,'${id||""}')"><div class="two"><label class="fl">Nombre<input name="nombre" required value="${esc(p.nombre)}"></label><label class="fl">Qué les compramos<input name="categoria" value="${esc(p.categoria)}" placeholder="Bases de perfume"></label></div>
+   <div class="three"><label class="fl">Contacto<input name="contacto" value="${esc(p.contacto)}"></label><label class="fl">Teléfono<input name="telefono" value="${esc(p.telefono)}"></label><label class="fl">Email<input name="email" value="${esc(p.email)}"></label></div>
+   <label class="fl">Web<input name="web" value="${esc(p.web)}"></label><label class="fl">Notas (pedido mínimo, plazos, descuentos…)<textarea name="notas">${esc(p.notas)}</textarea></label>
+   <div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${id?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delProv('${id}')">Eliminar</button>`:""}</div></form>`)}
+async function saveProv(e,id){e.preventDefault();const f=readForm($("#pf"));const p=id?{...D.proveedor.find(x=>x.id===id),...f}:f;await save("proveedor",p);closeDr();render()}
+async function delProv(id){if(!confirm("¿Eliminar?"))return;await del("proveedor",id);closeDr();render()}
+
+/* ---------------- MENSAJES (plantillas) ---------------- */
+function vPlant(){return ph("Mensajes","Plantillas de WhatsApp y email. Se rellenan solas desde cada taller.",`<button class="btn" onclick="editPlant(-1)">+ Plantilla</button>`)+
+  `<p class="empty">Huecos disponibles: {nombre} {taller} {fecha} {hora} {lugar} {personas} {total}</p><div class="grid g2">${AJ.plantillas.map((p,i)=>`<div class="card" style="cursor:pointer" onclick="editPlant(${i})"><h2>${esc(p.nombre)}</h2><p style="white-space:pre-wrap;color:var(--muted);margin:0">${esc(p.texto)}</p></div>`).join("")}</div>`}
+function editPlant(i){const p=i>=0?AJ.plantillas[i]:{nombre:"",texto:""};
+  openDr(i>=0?"Editar plantilla":"Nueva plantilla",`<form class="f" onsubmit="savePlant(event,${i})"><label class="fl">Nombre<input name="nombre" required value="${esc(p.nombre)}"></label><label class="fl">Texto<textarea name="texto" style="min-height:180px" required>${esc(p.texto)}</textarea></label><div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${i>=0?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delPlant(${i})">Eliminar</button>`:""}</div></form>`)}
+async function savePlant(e,i){e.preventDefault();const f=readForm(e.target);const a=structuredClone(AJ);if(i>=0)a.plantillas[i]=f;else a.plantillas.push(f);await saveAj(a);closeDr();render()}
+async function delPlant(i){if(!confirm("¿Eliminar plantilla?"))return;const a=structuredClone(AJ);a.plantillas.splice(i,1);await saveAj(a);closeDr();render()}
+async function saveAj(a){const cur=D.ajustes[0];a.id=cur?.id;await save("ajustes",a);toast("Ajustes guardados")}
+
+/* ---------------- AJUSTES ---------------- */
+function vAj(){const e=AJ.empresa;
+  return ph("Ajustes","Precios, extras, datos de facturación y equipo.")+`<form class="f" id="af" onsubmit="saveAjustes(event)">
+  <div class="card"><h2>Precios por persona</h2><p class="empty" style="margin-top:-6px">Se usan para calcular el presupuesto. Siempre podéis cambiar el precio en cada taller. El coste es lo que os cuesta el material por persona (para saber el margen).</p>
+   <div class="tw"><table><thead><tr><th>Taller</th><th class="num">Empresa €</th><th class="num">Particular €</th><th class="num">Coste material €</th></tr></thead><tbody>${TALLERES.map(([c,n])=>`<tr><td><b>${c}</b> ${n}</td>${["empresa","particular","coste"].map(k=>`<td class="num"><input class="in" style="width:90px;text-align:right" data-t="${c}" data-k="${k}" inputmode="decimal" value="${esc(AJ.tarifas[c]?.[k]??"")}"></td>`).join("")}</tr>`).join("")}</tbody></table></div></div>
+  <div class="card" style="margin-top:14px"><h2>Extras de la fórmula</h2><div class="lines" id="aj-ex">${AJ.extras.map((x,i)=>`<div class="ln" style="grid-template-columns:minmax(0,1fr) 130px 90px 30px"><input data-x="${i}" data-k="nombre" value="${esc(x.nombre)}"><select data-x="${i}" data-k="modo">${opts([["persona","Por persona"],["fijo","Precio fijo"]],x.modo)}</select><input data-x="${i}" data-k="precio" inputmode="decimal" value="${esc(x.precio)}"><button type="button" class="del" onclick="this.parentNode.remove()">×</button></div>`).join("")}</div><button type="button" class="btn s o" onclick="addAjEx()">+ Extra</button></div>
+  <div class="card" style="margin-top:14px"><h2>Datos para presupuestos y facturas</h2><div class="f">
+   <div class="two"><label class="fl">Nombre comercial<input name="e_nombre" value="${esc(e.nombre)}"></label><label class="fl">Titular (nombre fiscal)<input name="e_titular" value="${esc(e.titular)}"></label></div>
+   <div class="two"><label class="fl">NIF<input name="e_nif" value="${esc(e.nif)}"></label><label class="fl">Dirección fiscal<input name="e_direccion" value="${esc(e.direccion)}"></label></div>
+   <div class="three"><label class="fl">Email<input name="e_email" value="${esc(e.email)}"></label><label class="fl">Teléfono<input name="e_telefono" value="${esc(e.telefono)}"></label><label class="fl">Web<input name="e_web" value="${esc(e.web)}"></label></div>
+   <label class="fl">IBAN (sale en las facturas)<input name="e_iban" value="${esc(e.iban)}"></label>
+   <div class="three"><label class="fl">IVA por defecto (%)<input name="iva" inputmode="decimal" value="${esc(AJ.iva)}"></label><label class="fl">Validez presupuesto (días)<input name="validez" inputmode="numeric" value="${esc(AJ.validez)}"></label><label class="fl">Meta de facturación mensual (€)<input name="meta" inputmode="decimal" value="${esc(AJ.meta)}"></label></div>
+   <label class="fl">Nota al pie del presupuesto<textarea name="notaPresupuesto">${esc(AJ.notaPresupuesto)}</textarea></label>
+   <label class="fl">Nota al pie de la factura<textarea name="notaFactura">${esc(AJ.notaFactura)}</textarea></label>
+   <label class="fl">Equipo (separado por comas)<input name="equipo" value="${esc(AJ.equipo.join(", "))}"></label></div></div>
+  <div class="row" style="margin-top:14px"><button class="btn">Guardar ajustes</button></div></form>
+  <div class="card" style="margin-top:14px"><h2>Copia de seguridad</h2><p class="empty" style="margin-top:-6px">Descarga todos los datos en un archivo o recupéralos desde uno.</p><div class="row"><button class="btn o" onclick="backup()">Descargar copia</button><label class="btn o">Restaurar copia<input type="file" accept=".json" hidden onchange="restore(this.files[0])"></label></div></div>`}
+function addAjEx(){const i=Date.now();$("#aj-ex").insertAdjacentHTML("beforeend",`<div class="ln" style="grid-template-columns:minmax(0,1fr) 130px 90px 30px"><input data-x="${i}" data-k="nombre"><select data-x="${i}" data-k="modo">${opts([["persona","Por persona"],["fijo","Precio fijo"]],"fijo")}</select><input data-x="${i}" data-k="precio" inputmode="decimal" value="0"><button type="button" class="del" onclick="this.parentNode.remove()">×</button></div>`)}
+async function saveAjustes(e){e.preventDefault();const f=$("#af");const a=structuredClone(AJ);
+  f.querySelectorAll("[data-t]").forEach(i=>{a.tarifas[i.dataset.t]=a.tarifas[i.dataset.t]||{};a.tarifas[i.dataset.t][i.dataset.k]=num(i.value)});
+  const ex={};f.querySelectorAll("[data-x]").forEach(i=>{(ex[i.dataset.x]=ex[i.dataset.x]||{})[i.dataset.k]=i.dataset.k==="precio"?num(i.value):i.value.trim()});a.extras=Object.values(ex).filter(x=>x.nombre);
+  const o=readForm(f);for(const k in o){if(k.startsWith("e_"))a.empresa[k.slice(2)]=o[k]}
+  a.iva=num(o.iva);a.validez=num(o.validez)||15;a.meta=num(o.meta);a.notaPresupuesto=o.notaPresupuesto;a.notaFactura=o.notaFactura;a.equipo=o.equipo.split(",").map(s=>s.trim()).filter(Boolean);
+  await saveAj(a);render()}
+function backup(){const all=[];KINDS.forEach(k=>D[k].forEach(x=>{const {id,...data}=x;all.push({id,kind:k,data})}));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(all,null,1)],{type:"application/json"}));a.download=`lannex-gestion-${today()}.json`;a.click()}
+async function restore(file){if(!file)return;if(!confirm("Se añadirán o sobrescribirán los datos con los del archivo. ¿Seguir?"))return;const rows=JSON.parse(await file.text());for(const r of rows){if(KINDS.includes(r.kind))await save(r.kind,{...r.data,id:r.id})}await loadAll();toast("Copia restaurada");renderNav();render()}
+
+/* ---------------- arranque ---------------- */
+if(!DEMO&&!sb){$("#l-err").textContent="No se pudo cargar la conexión. Recarga la página.";$("#l-err").style.display="block"}
+start();
+window.addEventListener("focus",async()=>{if(document.getElementById("app").style.display==="block"&&!$("#dr").classList.contains("open")){await loadAll();renderNav();render()}});
+</script>
+</body>
+</html>

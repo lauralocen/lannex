@@ -1,4 +1,5 @@
 User-agent: *
+Disallow: /gestion/
 Allow: /
 
 Sitemap: https://lannexlab.com/sitemap.xml
