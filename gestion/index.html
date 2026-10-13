@@ -215,7 +215,7 @@ async function loadAll(){
   let rows=[];
   if(DEMO){rows=lsGet()}
   else{
-    let from=0;for(;;){const {data,error}=await sb.from("lannex_items").select("id,kind,data").range(from,from+999);if(error){toast("Error cargando: "+error.message);break}rows=rows.concat(data);if(data.length<1000)break;from+=1000}
+    let from=0;for(;;){const {data,error}=await sb.from("lannex_items").select("id,kind,data").range(from,from+999);if(error){dbErr("cargar",error);break}rows=rows.concat(data);if(data.length<1000)break;from+=1000}
   }
   KINDS.forEach(k=>D[k]=[]);
   rows.forEach(r=>{if(D[r.kind])D[r.kind].push({...r.data,id:r.id})});
@@ -223,18 +223,24 @@ async function loadAll(){
 }
 function deepMerge(base,o){for(const k in o){if(o[k]&&typeof o[k]==="object"&&!Array.isArray(o[k])&&base[k]&&typeof base[k]==="object")deepMerge(base[k],o[k]);else base[k]=o[k]}return base}
 function uid(){return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))}
+function dbErr(acc,error){const m=(error&&error.message)||String(error);let t;
+  if(/row-level security|permission denied|42501/i.test(m+" "+(error.code||"")))t=`No se ha podido ${acc}: tu email (${USER}) no está en la lista del equipo de Lannex. Hay que añadirlo en Supabase.`;
+  else if(/relation .* does not exist|42P01|Could not find the table/i.test(m))t=`No se ha podido ${acc}: falta crear la tabla en Supabase (el texto del SQL Editor no se ejecutó bien).`;
+  else if(/JWT|apikey|API key|401/i.test(m))t=`No se ha podido ${acc}: la sesión ha caducado o la clave no es correcta. Cierra sesión y vuelve a entrar.`;
+  else t=`No se ha podido ${acc}: ${m}`;
+  alert(t)}
 async function save(kind,obj){
   if(!obj.id)obj.id=uid();obj._upd=new Date().toISOString();obj._by=USER;
   const {id,...data}=obj;
   if(DEMO){const a=lsGet();const i=a.findIndex(r=>r.id===id);const row={id,kind,data};if(i>=0)a[i]=row;else a.push(row);lsSet(a)}
-  else{const {error}=await sb.from("lannex_items").upsert({id,kind,data,updated_by:USER});if(error){toast("Error guardando: "+error.message);throw error}}
+  else{const {error}=await sb.from("lannex_items").upsert({id,kind,data,updated_by:USER});if(error){dbErr("guardar",error);throw error}}
   const arr=D[kind];const i=arr.findIndex(x=>x.id===id);if(i>=0)arr[i]=obj;else arr.push(obj);
   if(kind==="ajustes")AJ=deepMerge(structuredClone(DEF_AJUSTES),obj);
   return obj;
 }
 async function del(kind,id){
   if(DEMO){lsSet(lsGet().filter(r=>r.id!==id))}
-  else{const {error}=await sb.from("lannex_items").delete().eq("id",id);if(error){toast("Error borrando: "+error.message);throw error}}
+  else{const {error}=await sb.from("lannex_items").delete().eq("id",id);if(error){dbErr("borrar",error);throw error}}
   D[kind]=D[kind].filter(x=>x.id!==id);
 }
 
@@ -364,6 +370,7 @@ function editTaller(id,clienteId){
   openDr(id?"Editar taller":"Nuevo taller",`<form class="f" id="tf" onsubmit="saveTaller(event)">
    <div class="two"><label class="fl">Cliente<select name="clienteId" required>${opts(D.cliente.map(c=>[c.id,c.nombre]).sort((a,b)=>a[1].localeCompare(b[1])),t.clienteId,"Elige cliente…")}</select></label>
    <label class="fl">&nbsp;<button type="button" class="btn o" onclick="quickCliente()">+ Cliente nuevo</button></label></div>
+   <div id="qc" class="card" style="display:none;background:#fff"><div class="f"><span class="lb">Cliente nuevo</span><div class="two"><label class="fl">Nombre<input id="qc-n"></label><label class="fl">Tipo<select id="qc-t">${opts(TIPOS,"empresa")}</select></label></div><div class="two"><label class="fl">Teléfono<input id="qc-tel" type="tel"></label><label class="fl">Email<input id="qc-em" type="email"></label></div><div class="row"><button type="button" class="btn s" onclick="saveQuick()">Crear cliente</button><button type="button" class="btn s o" onclick="$('#qc').style.display='none'">Cancelar</button></div></div></div>
    <div class="two"><label class="fl">Ocasión<select name="ocasion">${opts(OCASIONES,t.ocasion,"—")}</select></label><label class="fl">Estado<select name="estado">${opts(ESTADOS,t.estado)}</select></label></div>
    <div class="sec">Talleres</div>
    <div class="tl">${TALLERES.map(([c,n,k])=>`<label class="${k==="c"?"c":""}"><input type="checkbox" name="talleres" data-multi="1" value="${c}" ${t.talleres?.includes(c)?"checked":""} onchange="repriceT()"><b>${c}</b>${n}</label>`).join("")}</div>
@@ -397,10 +404,13 @@ function updTot(){const f=readForm($("#tf"));const t={...window._T,...f,extras:w
   $("#t-tot").innerHTML=`<span>Subtotal ${eur(c.bruto)}</span>${c.dto?`<span>Descuento −${eur(c.dto)}</span>`:""}<span>Base ${eur(c.base)} · IVA ${c.ivaP}% ${eur(c.iva)}</span><b>Total ${eur(c.total)}</b><span class="lb">Coste materiales aprox. ${eur(c.coste)} · ${c.base?Math.round((c.base-c.coste)/c.base*100):0}% margen</span>`}
 async function saveTaller(e){e.preventDefault();const f=readForm($("#tf"));const t={...window._T,...f,extras:window._T.extras.filter(x=>x.nombre)};
   if(t.estado==="presupuesto"&&!t.presuFecha)t.presuFecha=today();
-  await save("taller",t);closeDr();toast("Taller guardado");renderNav();render();openTaller(t.id)}
+  try{await save("taller",t)}catch(err){return}closeDr();toast("Taller guardado");renderNav();render();openTaller(t.id)}
 async function delTaller(id){if(!confirm("¿Eliminar este taller?"))return;await del("taller",id);closeDr();toast("Eliminado");renderNav();render()}
-function quickCliente(){const n=prompt("Nombre del cliente (empresa o persona):");if(!n)return;const tipo=confirm("¿Es una empresa? (Aceptar = empresa, Cancelar = particular)")?"empresa":"particular";
-  save("cliente",{nombre:n,tipo,fecha:today()}).then(c=>{const sel=$("#tf select[name=clienteId]");sel.insertAdjacentHTML("beforeend",`<option value="${c.id}" selected>${esc(n)}</option>`);sel.value=c.id;$("#tf select[name=tarifa]").value=tipo==="particular"?"particular":"empresa";repriceT(true)})}
+function quickCliente(){$("#qc").style.display="block";$("#qc-n").focus()}
+async function saveQuick(){const n=val("qc-n");if(!n){toast("Pon el nombre");return}const tipo=$("#qc-t").value;
+  let c;try{c=await save("cliente",{nombre:n,tipo,telefono:val("qc-tel"),email:val("qc-em"),fecha:today()})}catch(e){return}
+  const sel=$("#tf select[name=clienteId]");sel.insertAdjacentHTML("beforeend",`<option value="${c.id}">${esc(n)}</option>`);sel.value=c.id;
+  $("#tf select[name=tarifa]").value=tipo==="particular"?"particular":"empresa";$("#qc").style.display="none";repriceT(true);toast("Cliente creado")}
 
 function openTaller(id){
   const t=D.taller.find(x=>x.id===id);if(!t)return;const c=cliente(t.clienteId)||{};const k=calc(t);
@@ -516,7 +526,7 @@ function editCliente(id){const c=id?D.cliente.find(x=>x.id===id):{tipo:"empresa"
    <div class="row" style="justify-content:space-between"><button class="btn">Guardar</button>${id?`<button type="button" class="btn o" style="color:var(--red);border-color:var(--red)" onclick="delCliente('${id}')">Eliminar</button>`:""}</div></form>`)}
 async function saveCliente(e,id){e.preventDefault();const f=readForm($("#cf"));
   if(!id){const dup=D.cliente.find(c=>(f.telefono&&phoneIntl(c.telefono)===phoneIntl(f.telefono))||(f.email&&c.email?.toLowerCase()===f.email.toLowerCase()));if(dup&&!confirm(`Ya existe "${dup.nombre}" con ese teléfono o email. ¿Crear igualmente?`))return}
-  const c=id?{...D.cliente.find(x=>x.id===id),...f}:{...f,fecha:today()};await save("cliente",c);toast("Cliente guardado");render();openCliente(c.id)}
+  const c=id?{...D.cliente.find(x=>x.id===id),...f}:{...f,fecha:today()};try{await save("cliente",c)}catch(err){return}toast("Cliente guardado");render();openCliente(c.id)}
 async function delCliente(id){if(D.taller.some(t=>t.clienteId===id)){toast("Tiene talleres: bórralos antes");return}if(!confirm("¿Eliminar cliente?"))return;await del("cliente",id);closeDr();render()}
 function openCliente(id){const c=cliente(id);if(!c)return;const ts=D.taller.filter(t=>t.clienteId===id).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
   openDr(esc(c.nombre),`<div class="row" style="margin-bottom:12px"><span class="tag">${esc((TIPOS.find(x=>x[0]===c.tipo)||[,""])[1])}</span>${c.origen?`<span class="tag">${esc(c.origen)}</span>`:""}</div>
