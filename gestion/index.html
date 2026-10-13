@@ -131,6 +131,7 @@ label.fl{display:grid;gap:4px;font-size:.78rem;font-weight:600;color:var(--muted
     <form class="f" onsubmit="doLogin(event)">
       <label class="fl">Email<input type="email" id="l-email" autocomplete="username" required></label>
       <label class="fl">Contraseña<input type="password" id="l-pass" autocomplete="current-password" required></label>
+      <p style="font-size:.8rem;color:var(--muted);margin:0">Solo tendrás que entrar una vez en cada dispositivo.</p>
       <button class="btn" type="submit" style="justify-content:center">Entrar</button>
       <p id="l-err" style="color:var(--red);font-size:.85rem;margin:0;display:none"></p>
     </form>
@@ -200,7 +201,7 @@ const DEF_AJUSTES={
 
 /* ---------------- almacenamiento ---------------- */
 const DEMO=!SUPABASE_URL||!SUPABASE_ANON_KEY;
-const sb=(!DEMO&&window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const sb=(!DEMO&&window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"lannex-gestion-auth"}}):null;
 const KINDS=["cliente","taller","doc","gasto","material","proveedor","tarea","ajustes"];
 const D={};KINDS.forEach(k=>D[k]=[]);
 let AJ=structuredClone(DEF_AJUSTES);let USER="";
