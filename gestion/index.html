@@ -84,6 +84,7 @@ label.fl{display:grid;gap:4px;font-size:.78rem;font-weight:600;color:var(--muted
 .tot{display:grid;gap:4px;justify-content:end;text-align:right;font-variant-numeric:tabular-nums}.tot b{font:600 1.3rem var(--serif)}
 .lines .ln{display:grid;grid-template-columns:minmax(0,1fr) 110px 70px 80px 30px;gap:6px;align-items:center;margin-bottom:6px}
 .lines .ln input,.lines .ln select{padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;width:100%}
+.lines .ln.cx{grid-template-columns:24px minmax(0,1fr) 110px 56px 74px 74px 24px}
 .del{all:unset;cursor:pointer;color:var(--red);font-size:1.2rem;text-align:center}
 .tl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.tl label{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px;font-size:.78rem;text-align:center;cursor:pointer}
 .tl input{display:none}.tl label:has(input:checked){background:var(--amber2);border-color:var(--amber)}.tl label b{display:block;font:500 1.2rem var(--serif)}
@@ -107,6 +108,8 @@ label.fl{display:grid;gap:4px;font-size:.78rem;font-weight:600;color:var(--muted
  .lines .ln{grid-template-columns:minmax(0,1fr) 90px 56px 70px 24px}
  .cal .d{min-height:64px;font-size:.66rem;padding:4px}.tl{grid-template-columns:repeat(3,minmax(0,1fr))}
  .hide-m{display:none}
+ #calcgrid{grid-template-columns:1fr!important}#c-res{position:static!important}
+ .lines .ln.cx{grid-template-columns:22px repeat(4,minmax(0,1fr)) 20px}.lines .ln.cx>:nth-child(2){grid-column:2/-1}.lines .ln.cx>:nth-child(3){grid-column:1/span 2}.lines .ln.cx{border-bottom:1px solid var(--line);padding-bottom:8px}
 }
 @media print{
  body.printing #app,body.printing #login,body.printing #dr,body.printing #ov,body.printing #toast{display:none!important}
@@ -287,14 +290,14 @@ function payTag(t){if(t.estado==="perdido"||t.estado==="lead")return"";const c=c
 function stTag(e){return `<span class="tag t-${e}">${ENAME[e]||e}</span>`}
 
 /* ---------------- navegación ---------------- */
-const NAV=[["resumen","Resumen","◎"],["talleres","Talleres","⚗"],["calendario","Calendario","▦"],["clientes","Clientes","☺"],["tareas","Seguimientos","✓"],["documentos","Presupuestos y facturas","▤"],["finanzas","Finanzas","€"],["materiales","Materiales","⬡"],["proveedores","Proveedores","⇄"],["plantillas","Mensajes","✉"],["ajustes","Ajustes","⚙"]];
+const NAV=[["resumen","Resumen","◎"],["talleres","Talleres","⚗"],["calendario","Calendario","▦"],["clientes","Clientes","☺"],["tareas","Seguimientos","✓"],["calculadora","Calculadora","±"],["documentos","Presupuestos y facturas","▤"],["finanzas","Finanzas","€"],["materiales","Materiales","⬡"],["proveedores","Proveedores","⇄"],["plantillas","Mensajes","✉"],["ajustes","Ajustes","⚙"]];
 let ROUTE="resumen";
 function go(r){if(!NAV.find(n=>n[0]===r))r="resumen";ROUTE=r;history.replaceState(null,"","#"+r);renderNav();$("#side").classList.remove("open");render();window.scrollTo(0,0)}
 function renderNav(){
   const cnt={tareas:pendTareas().length,materiales:D.material.filter(m=>num(m.stock)<=num(m.minimo)&&m.minimo!=="").length,talleres:D.taller.filter(t=>t.estado==="lead").length};
   $("#nav").innerHTML=NAV.map(([id,l,i])=>`<button class="${ROUTE===id?"on":""}" onclick="go('${id}')"><span style="width:18px;text-align:center">${i}</span>${l}${cnt[id]?`<span class="ct">${cnt[id]}</span>`:""}</button>`).join("");
 }
-function render(){const f={resumen:vResumen,talleres:vTalleres,calendario:vCal,clientes:vClientes,tareas:vTareas,documentos:vDocs,finanzas:vFin,materiales:vMat,proveedores:vProv,plantillas:vPlant,ajustes:vAj}[ROUTE];$("#main").innerHTML=(DEMO?`<div class="demo"><b>Modo prueba.</b> Los datos se guardan solo en este navegador. Cuando conectemos la base de datos, los tres veréis lo mismo desde cualquier dispositivo.</div>`:"")+f()}
+function render(){const f={resumen:vResumen,talleres:vTalleres,calendario:vCal,clientes:vClientes,tareas:vTareas,documentos:vDocs,calculadora:vCalc,finanzas:vFin,materiales:vMat,proveedores:vProv,plantillas:vPlant,ajustes:vAj}[ROUTE];$("#main").innerHTML=(DEMO?`<div class="demo"><b>Modo prueba.</b> Los datos se guardan solo en este navegador. Cuando conectemos la base de datos, los tres veréis lo mismo desde cualquier dispositivo.</div>`:"")+f();if(ROUTE==="calculadora")cU()}
 function ph(t,p,acts){return `<div class="ph"><div><h1>${t}</h1>${p?`<p>${p}</p>`:""}</div><div class="row">${acts||""}</div></div>`}
 
 /* ---------------- RESUMEN ---------------- */
@@ -354,6 +357,7 @@ function vTalleres(){
 function newTaller(clienteId){editTaller(null,clienteId)}
 function editTaller(id,clienteId){
   const t=id?structuredClone(D.taller.find(x=>x.id===id)):{estado:"lead",tarifa:"particular",clienteId:clienteId||"",talleres:["Pf"],personas:"",extras:[],pagos:[],equipo:[],iva:"",origen:""};
+  if(!id&&window._calcPreset){Object.assign(t,window._calcPreset);window._calcPreset=null}
   if(!id&&clienteId){const c=cliente(clienteId);if(c)t.tarifa=c.tipo==="particular"?"particular":"empresa"}
   if(!t.precioPersona)t.precioPersona=suggestPrice(t);
   window._T=t;
@@ -612,6 +616,58 @@ async function savePlant(e,i){e.preventDefault();const f=readForm(e.target);cons
 async function delPlant(i){if(!confirm("¿Eliminar plantilla?"))return;const a=structuredClone(AJ);a.plantillas.splice(i,1);await saveAj(a);closeDr();render()}
 async function saveAj(a){const cur=D.ajustes[0];a.id=cur?.id;await save("ajustes",a);toast("Ajustes guardados")}
 
+/* ---------------- CALCULADORA ---------------- */
+let CALC=null;
+function calcInit(){
+  try{CALC=JSON.parse(localStorage.getItem("lannex_calc")||"null")}catch(e){}
+  if(!CALC)CALC={tarifa:"empresa",personas:15,talleres:["Pf"],precio:"",coste:"",extras:AJ.extras.map(x=>({...x,on:false,coste:0,cant:1})),desplazamiento:0,espacio:0,equipo:0,otros:0,dto:0,iva:AJ.iva,objetivo:50,auto:true};
+}
+function calcSave(){try{localStorage.setItem("lannex_calc",JSON.stringify(CALC))}catch(e){}}
+function calcBase(){const p=CALC.talleres.reduce((a,c)=>a+num(AJ.tarifas[c]?.[CALC.tarifa]),0);const k=CALC.talleres.reduce((a,c)=>a+num(AJ.tarifas[c]?.coste),0);return {p,k}}
+function calcRes(){const n=num(CALC.personas);const pp=num(CALC.precio);const base=n*pp;
+  const ex=CALC.extras.filter(x=>x.on&&x.nombre).map(x=>{const c=x.modo==="persona"?n:num(x.cant||1);return {...x,c,venta:c*num(x.precio),gasto:c*num(x.coste)}});
+  const exV=ex.reduce((a,x)=>a+x.venta,0),exC=ex.reduce((a,x)=>a+x.gasto,0);
+  const bruto=base+exV;const dto=bruto*num(CALC.dto)/100;const neto=bruto-dto;const iva=neto*num(CALC.iva)/100;
+  const mat=n*num(CALC.coste);const fijos=num(CALC.desplazamiento)+num(CALC.espacio)+num(CALC.equipo)+num(CALC.otros);
+  const costes=mat+exC+fijos;const ben=neto-costes;
+  // precio por persona para llegar al margen objetivo (sobre la base sin IVA)
+  const obj=num(CALC.objetivo)/100;let sug=0;if(n>0&&obj<1){const need=costes/(1-obj);sug=Math.max(0,(need/(1-num(CALC.dto)/100)-exV)/n)}
+  return {n,pp,base,ex,exV,exC,bruto,dto,neto,iva,total:neto+iva,mat,fijos,costes,ben,margen:neto?ben/neto*100:0,sug}}
+function vCalc(){if(!CALC)calcInit();const b=calcBase();if(CALC.auto){CALC.precio=b.p;CALC.coste=b.k}
+  return ph("Calculadora","Calcula el precio de un taller con sus extras y mira cuánto ganáis.",`<button class="btn o" onclick="calcReset()">Empezar de cero</button>`)+
+  `<div class="grid" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start" id="calcgrid">
+  <div class="grid">
+   <div class="card f"><h2>El taller</h2>
+    <div class="chips">${[["empresa","Empresa"],["particular","Particular"]].map(([v,l])=>`<button type="button" class="chip ${CALC.tarifa===v?"on":""}" onclick="CALC.tarifa='${v}';CALC.auto=true;cR()">${l}</button>`).join("")}</div>
+    <div class="tl">${TALLERES.map(([c,n,k])=>`<label class="${k==="c"?"c":""}"><input type="checkbox" ${CALC.talleres.includes(c)?"checked":""} onchange="calcTog('${c}',this.checked)"><b>${c}</b>${n}</label>`).join("")}</div>
+    <div class="three"><label class="fl">Personas<input inputmode="numeric" value="${esc(CALC.personas)}" oninput="CALC.personas=this.value;cU()"></label>
+     <label class="fl">Precio por persona (€)<input id="c-pp" inputmode="decimal" value="${esc(CALC.precio)}" oninput="CALC.precio=this.value;CALC.auto=false;cU()"></label>
+     <label class="fl">Coste material / persona (€)<input id="c-k" inputmode="decimal" value="${esc(CALC.coste)}" oninput="CALC.coste=this.value;CALC.auto=false;cU()"></label></div>
+    <p class="lb" style="margin:0">${CALC.auto?"Precios cogidos de Ajustes":"Precios cambiados a mano · "}${CALC.auto?"":`<a href="#" onclick="CALC.auto=true;cR();return false">volver a los de Ajustes</a>`}</p>
+   </div>
+   <div class="card f"><h2>Extras de personalización</h2><p class="empty" style="margin:-6px 0 0">Marca los que lleva. «Cobras» es lo que paga el cliente y «Te cuesta» lo que os cuesta a vosotros.</p>
+    <div class="lines"><div class="ln lb cx"><span></span><span></span><span></span><span>Cant.</span><span>Cobras €</span><span>Cuesta €</span><span></span></div>${CALC.extras.map((x,i)=>`<div class="ln cx"><input type="checkbox" ${x.on?"checked":""} onchange="CALC.extras[${i}].on=this.checked;cU()" style="width:18px;height:18px"><input value="${esc(x.nombre)}" placeholder="Extra" oninput="CALC.extras[${i}].nombre=this.value;cU()"><select onchange="CALC.extras[${i}].modo=this.value;cR()">${opts([["persona","Por persona"],["fijo","Fijo"]],x.modo)}</select><input ${x.modo==="persona"?"disabled placeholder='×pers'":""} value="${x.modo==="persona"?"":esc(x.cant??1)}" inputmode="decimal" title="Cantidad" oninput="CALC.extras[${i}].cant=this.value;cU()"><input value="${esc(x.precio)}" inputmode="decimal" title="Cobras €" placeholder="Cobras" oninput="CALC.extras[${i}].precio=this.value;cU()"><input value="${esc(x.coste)}" inputmode="decimal" title="Te cuesta €" placeholder="Cuesta" oninput="CALC.extras[${i}].coste=this.value;cU()"><button type="button" class="del" onclick="CALC.extras.splice(${i},1);cR()">×</button></div>`).join("")}</div>
+    <button type="button" class="btn s o" onclick="CALC.extras.push({nombre:'',modo:'persona',precio:0,coste:0,cant:1,on:true});cR()">+ Otro extra</button>
+   </div>
+   <div class="card f"><h2>Otros costes del día</h2>
+    <div class="two"><label class="fl">Desplazamiento (€)<input inputmode="decimal" value="${esc(CALC.desplazamiento)}" oninput="CALC.desplazamiento=this.value;cU()"></label><label class="fl">Alquiler de espacio (€)<input inputmode="decimal" value="${esc(CALC.espacio)}" oninput="CALC.espacio=this.value;cU()"></label></div>
+    <div class="two"><label class="fl">Pago a colaboradores (€)<input inputmode="decimal" value="${esc(CALC.equipo)}" oninput="CALC.equipo=this.value;cU()"></label><label class="fl">Otros (€)<input inputmode="decimal" value="${esc(CALC.otros)}" oninput="CALC.otros=this.value;cU()"></label></div>
+    <div class="three"><label class="fl">Descuento (%)<input inputmode="decimal" value="${esc(CALC.dto)}" oninput="CALC.dto=this.value;cU()"></label><label class="fl">IVA (%)<input inputmode="decimal" value="${esc(CALC.iva)}" oninput="CALC.iva=this.value;cU()"></label><label class="fl">Margen que queréis (%)<input inputmode="decimal" value="${esc(CALC.objetivo)}" oninput="CALC.objetivo=this.value;cU()"></label></div>
+   </div>
+  </div>
+  <div class="card" id="c-res" style="position:sticky;top:20px"></div></div>`}
+function cU(){calcSave();const r=calcRes();const el=$("#c-res");if(!el)return;const row=(l,v,b)=>`<div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>${l}</span>${b?`<b>${v}</b>`:`<span>${v}</span>`}</div>`;
+  el.innerHTML=`<span class="lb">Precio para el cliente</span><div style="font:500 2.6rem var(--serif);margin:4px 0">${eur(r.total)}</div><div class="s" style="color:var(--muted);margin-bottom:12px">IVA incluido · ${r.n?eur(r.total/r.n):"—"} por persona</div>
+   ${row(`Taller (${r.n} × ${eur(r.pp)})`,eur(r.base))}${r.ex.map(x=>row(esc(x.nombre)+(x.modo==="persona"?` (${x.c} × ${eur(x.precio)})`:""),eur(x.venta))).join("")}${r.dto?row(`Descuento ${num(CALC.dto)}%`,"−"+eur(r.dto)):""}${row("Base sin IVA",eur(r.neto),1)}${row(`IVA ${num(CALC.iva)}%`,eur(r.iva))}
+   <div class="lb" style="margin-top:18px">Lo que os cuesta</div>${row("Material del taller",eur(r.mat))}${r.exC?row("Material de los extras",eur(r.exC)):""}${r.fijos?row("Desplazamiento, espacio y otros",eur(r.fijos)):""}${row("Total costes",eur(r.costes),1)}
+   <div style="margin-top:16px;padding:14px;border-radius:14px;background:${r.ben>=0?"var(--sage2)":"var(--red2)"}"><span class="lb">Beneficio</span><div style="font:500 2rem var(--serif)">${eur(r.ben)}</div><div style="font-size:.85rem">Margen ${Math.round(r.margen)}% · ${eur(r.ben/Math.max(1,AJ.equipo.length))} para cada uno de ${AJ.equipo.length}</div></div>
+   ${r.n?`<p style="font-size:.85rem;margin:12px 0 0">Para tener un <b>${num(CALC.objetivo)}% de margen</b>, el taller tendría que costar <b>${eur(r.sug)}</b> por persona. <a href="#" onclick="CALC.precio=${r.sug.toFixed(2)};CALC.auto=false;cR();return false">Usar este precio</a></p>`:""}
+   <div class="row" style="margin-top:16px"><button class="btn" onclick="calcToTaller()">Crear taller con este precio</button><button class="btn o" onclick="calcCopy()">Copiar resumen</button></div>`}
+function cR(){render();cU()}
+function calcTog(c,on){CALC.talleres=on?[...new Set([...CALC.talleres,c])]:CALC.talleres.filter(x=>x!==c);CALC.auto=true;cR()}
+function calcReset(){localStorage.removeItem("lannex_calc");CALC=null;cR()}
+function calcCopy(){const r=calcRes();const t=CALC.talleres.map(c=>TNAME[c]).join(" + ");const txt=`Taller de ${t.toLowerCase()} para ${r.n} personas\n- Taller: ${r.n} × ${eur(r.pp)} = ${eur(r.base)}\n${r.ex.map(x=>`- ${x.nombre}: ${eur(x.venta)}`).join("\n")}${r.ex.length?"\n":""}${r.dto?`- Descuento: −${eur(r.dto)}\n`:""}Total: ${eur(r.neto)} + IVA (${eur(r.total)} IVA incluido)`;navigator.clipboard.writeText(txt).then(()=>toast("Resumen copiado"))}
+function calcToTaller(){const r=calcRes();window._calcPreset={tarifa:CALC.tarifa,talleres:[...CALC.talleres],personas:String(CALC.personas),precioPersona:String(num(CALC.precio)),iva:String(num(CALC.iva)),descuento:r.dto?r.dto.toFixed(2):"",extras:r.ex.map(x=>({nombre:x.nombre,modo:x.modo,precio:num(x.precio),cant:x.cant}))};newTaller()}
 /* ---------------- AJUSTES ---------------- */
 function vAj(){const e=AJ.empresa;
   return ph("Ajustes","Precios, extras, datos de facturación y equipo.")+`<form class="f" id="af" onsubmit="saveAjustes(event)">
