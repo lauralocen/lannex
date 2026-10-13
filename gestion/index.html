@@ -620,7 +620,7 @@ async function saveAj(a){const cur=D.ajustes[0];a.id=cur?.id;await save("ajustes
 let CALC=null;
 function calcInit(){
   try{CALC=JSON.parse(localStorage.getItem("lannex_calc")||"null")}catch(e){}
-  if(!CALC)CALC={tarifa:"empresa",personas:15,talleres:["Pf"],precio:"",coste:"",extras:AJ.extras.map(x=>({...x,on:false,coste:0,cant:1})),desplazamiento:0,espacio:0,equipo:0,otros:0,dto:0,iva:AJ.iva,objetivo:50,auto:true};
+  if(!CALC)CALC={tarifa:"empresa",personas:15,talleres:["Pf"],precio:"",coste:"",extras:AJ.extras.map(x=>({...x,on:false,coste:0,cant:1})),desplazamiento:0,espacio:0,equipo:0,otros:0,dto:0,iva:AJ.iva,objetivo:50,reparto:2,auto:true};
 }
 function calcSave(){try{localStorage.setItem("lannex_calc",JSON.stringify(CALC))}catch(e){}}
 function calcBase(){const p=CALC.talleres.reduce((a,c)=>a+num(AJ.tarifas[c]?.[CALC.tarifa]),0);const k=CALC.talleres.reduce((a,c)=>a+num(AJ.tarifas[c]?.coste),0);return {p,k}}
@@ -653,6 +653,7 @@ function vCalc(){if(!CALC)calcInit();const b=calcBase();if(CALC.auto){CALC.preci
     <div class="two"><label class="fl">Desplazamiento (€)<input inputmode="decimal" value="${esc(CALC.desplazamiento)}" oninput="CALC.desplazamiento=this.value;cU()"></label><label class="fl">Alquiler de espacio (€)<input inputmode="decimal" value="${esc(CALC.espacio)}" oninput="CALC.espacio=this.value;cU()"></label></div>
     <div class="two"><label class="fl">Pago a colaboradores (€)<input inputmode="decimal" value="${esc(CALC.equipo)}" oninput="CALC.equipo=this.value;cU()"></label><label class="fl">Otros (€)<input inputmode="decimal" value="${esc(CALC.otros)}" oninput="CALC.otros=this.value;cU()"></label></div>
     <div class="three"><label class="fl">Descuento (%)<input inputmode="decimal" value="${esc(CALC.dto)}" oninput="CALC.dto=this.value;cU()"></label><label class="fl">IVA (%)<input inputmode="decimal" value="${esc(CALC.iva)}" oninput="CALC.iva=this.value;cU()"></label><label class="fl">Margen que queréis (%)<input inputmode="decimal" value="${esc(CALC.objetivo)}" oninput="CALC.objetivo=this.value;cU()"></label></div>
+    <div><span class="fl" style="display:block;margin-bottom:6px">El beneficio se reparte entre</span><div class="chips">${[2,3].map(n=>`<button type="button" class="chip ${num(CALC.reparto||2)===n?"on":""}" onclick="CALC.reparto=${n};cR()">${n} personas</button>`).join("")}</div></div>
    </div>
   </div>
   <div class="card" id="c-res" style="position:sticky;top:20px"></div></div>`}
@@ -660,7 +661,7 @@ function cU(){calcSave();const r=calcRes();const el=$("#c-res");if(!el)return;co
   el.innerHTML=`<span class="lb">Precio para el cliente</span><div style="font:500 2.6rem var(--serif);margin:4px 0">${eur(r.total)}</div><div class="s" style="color:var(--muted);margin-bottom:12px">IVA incluido · ${r.n?eur(r.total/r.n):"—"} por persona</div>
    ${row(`Taller (${r.n} × ${eur(r.pp)})`,eur(r.base))}${r.ex.map(x=>row(esc(x.nombre)+(x.modo==="persona"?` (${x.c} × ${eur(x.precio)})`:""),eur(x.venta))).join("")}${r.dto?row(`Descuento ${num(CALC.dto)}%`,"−"+eur(r.dto)):""}${row("Base sin IVA",eur(r.neto),1)}${row(`IVA ${num(CALC.iva)}%`,eur(r.iva))}
    <div class="lb" style="margin-top:18px">Lo que os cuesta</div>${row("Material del taller",eur(r.mat))}${r.exC?row("Material de los extras",eur(r.exC)):""}${r.fijos?row("Desplazamiento, espacio y otros",eur(r.fijos)):""}${row("Total costes",eur(r.costes),1)}
-   <div style="margin-top:16px;padding:14px;border-radius:14px;background:${r.ben>=0?"var(--sage2)":"var(--red2)"}"><span class="lb">Beneficio</span><div style="font:500 2rem var(--serif)">${eur(r.ben)}</div><div style="font-size:.85rem">Margen ${Math.round(r.margen)}% · ${eur(r.ben/Math.max(1,AJ.equipo.length))} para cada uno de ${AJ.equipo.length}</div></div>
+   <div style="margin-top:16px;padding:14px;border-radius:14px;background:${r.ben>=0?"var(--sage2)":"var(--red2)"}"><span class="lb">Beneficio</span><div style="font:500 2rem var(--serif)">${eur(r.ben)}</div><div style="font-size:.85rem">Margen ${Math.round(r.margen)}% · ${eur(r.ben/(num(CALC.reparto)||2))} para cada uno de los ${num(CALC.reparto)||2}</div></div>
    ${r.n?`<p style="font-size:.85rem;margin:12px 0 0">Para tener un <b>${num(CALC.objetivo)}% de margen</b>, el taller tendría que costar <b>${eur(r.sug)}</b> por persona. <a href="#" onclick="CALC.precio=${r.sug.toFixed(2)};CALC.auto=false;cR();return false">Usar este precio</a></p>`:""}
    <div class="row" style="margin-top:16px"><button class="btn" onclick="calcToTaller()">Crear taller con este precio</button><button class="btn o" onclick="calcCopy()">Copiar resumen</button></div>`}
 function cR(){render();cU()}
